@@ -1,0 +1,8 @@
+node_modules/
+dist/
+server/data/feed.json
+server/data/manual.json
+server/data/health.json
+.env
+*.log
+.DS_Store

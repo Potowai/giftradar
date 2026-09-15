@@ -1,0 +1,32 @@
+{
+  "sources": [
+    {
+      "id": "rd-giveaways",
+      "type": "reddit-feed",
+      "sub": "giveaways",
+      "lang": "en",
+      "name": "r/giveaways"
+    },
+    {
+      "id": "rd-freebies",
+      "type": "reddit-feed",
+      "sub": "freebies",
+      "lang": "en",
+      "name": "r/freebies"
+    },
+    {
+      "id": "rd-search-en",
+      "type": "reddit-search",
+      "query": "iphone giveaway winner",
+      "lang": "en",
+      "name": "Reddit search giveaway"
+    },
+    {
+      "id": "rd-search-fr",
+      "type": "reddit-search",
+      "query": "concours gagner iphone",
+      "lang": "fr",
+      "name": "Reddit search concours"
+    }
+  ]
+}
