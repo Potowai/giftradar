@@ -14,7 +14,7 @@
     "start": "node server/index.js",
     "preview": "vite preview",
     "test": "npm run test:server && npm run test:web",
-    "test:server": "GR_NO_LISTEN=1 node --test server/scrape.test.js",
+    "test:server": "GR_NO_LISTEN=1 node --test server/scrape.test.js server/og.test.js",
     "test:web": "vitest run",
     "typecheck": "tsc --noEmit -p web"
   },

@@ -17,3 +17,10 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Bug trouvé+corrigé : modelName dupliquait le "1" (1\s*17 au lieu de 17) — variants Pro/Max/Air OK maintenant.
 - Points faibles assumés : liens Google News = URLs de redirection (résolvent au clic) ; deadlines souvent null (triées en dernier) ; Reddit 0 entrée ce run (santé trackée, retry au prochain cron) ; quasi-doublons inter-flux possibles (URLs canoniques différentes).
 - Règle 5 : 1) compile oui (tsc + build verts, preuves ci-dessus) 2) meilleure solution ? non — GN RSS est le meilleur compromis fiabilité/effort 3) doutes listés ci-dessus, tous acceptés ou corrigés → zéro point bloquant restant.
+
+## 2.0 Ajout manuel + og-fetch (Phase 2)
+- POST /api/og : lit og:title/og:image/og:description (cheerio), fallback <title> puis hostname.
+- POST /api/entries : crée une entrée kind=manual via normalize (heuristiques réutilisées), override platform/prizeTier possible, persiste manual.json, fusionnée dans GET /api/feed sans doublon.
+- Vérifié live : entrée IG test créée (og bloqué par Instagram → fallback hostname, attendu), feed 160+1, puis manual.json réinitialisé.
+- Tests og.test.js : 3/3. Total serveur 13/13, web 5/5, build vert.
+- Règle 5 : 1) oui (preuves ci-dessus) 2) alternative (formulaire 100% client) rejetée — le serveur seul contourne les murs anti-hotlink 3) point faible : Instagram bloque l'og-fetch sans session → fallback hostname, l'utilisateur complète le titre à la main si besoin → accepté, zéro bloquant.
