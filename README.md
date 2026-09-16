@@ -1,6 +1,10 @@
 # GiftRadar
 
-Radar mobile-first de concours pour gagner un **iPhone 18 / 17 (Pro/Max/Air)** et autres lots Apple. Le serveur scanne 5 sources RSS 2×/jour, l'app liste tout, **un clic sur Ouvrir = marqué comme fait**, progression gardée dans le téléphone.
+Radar mobile-first de concours pour gagner un **iPhone 18 / 17 (Pro/Max/Air)** et autres lots Apple. **En ligne : https://potowai.github.io/giftradar/** (PWA installable, feed rescanné 2×/jour par GitHub Actions). **Un clic sur Ouvrir = marqué comme fait**, progression gardée dans le téléphone.
+
+## Version hébergée (recommandée)
+
+Rien à installer : ouvre https://potowai.github.io/giftradar/ sur iPhone → Partager → « Sur l'écran d'accueil ». Le feed est un snapshot rescanné à 08h/18h UTC ; tes coches restent dans `localStorage`. Le bouton + enregistre le lien en local (le serveur d'enrichissement tourne en version locale, voir ci-dessous).
 
 Règle produit : aucun concours exclu par géographie — on tente tout, la zone sert à trier (Nantes → France → Europe → Monde).
 

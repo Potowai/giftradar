@@ -35,3 +35,9 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - node-cron 08h00/18h00 (SCRAPE_CRON surchargeable) + re-scan au boot si feed vide ou >6h. Gardé hors tests (GR_NO_LISTEN).
 - README complet : install, accès iPhone en LAN, usage quotidien, API, données.
 - Règle 5 : 1) à vérifier (build+tests ci-dessous) 2) alternative (cron système) rejetée — node-cron = zéro config, suit le serveur 3) doute : si la machine dort, pas de scan — noté dans README (lane "machine allumée") → accepté, zéro bloquant.
+
+## 5.0 Deploy GitHub Pages (Phase 5, remplace Render)
+- Render Blueprint inutilisable → Pages + Actions : PWA statique (base relative), feed.snapshot.json commité, workflow scrape 08h/18h UTC qui commit le snapshot, workflow pages qui build+teste+déploie.
+- Front dégrade proprement sans serveur : snapshot embarqué, ajouts manuels 100% locaux.
+- Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
+- Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
