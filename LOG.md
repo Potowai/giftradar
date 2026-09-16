@@ -42,6 +42,13 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
 
+## 10.0 Concours influenceurs/marques EU-tech
+- jcb gagner-iphone = déjà 48 fiches influenceurs/marques (fabiancrfx, yanissa, ugreen, celio…) — cœur de la couverture.
+- Ajouté : cdn-instagram + cdn-x (standing, 0 Apple aujourd'hui, se déclencheront seuls).
+- Murs constatés : Gleam 403, Kingsumo 405, Sweepwidget JS-only, HotUKDeals 403, X/IG/TikTok = login requis, EchantillonsClub = archives mortes, pages marques ddj (fnac/darty/ldlc/orangé) = 0 Apple en cours (redondant avec recherche par lot de toute façon).
+- Résultat : 102 entrées (34 IG + 8 FB). Tests/build verts.
+- Règle 5 : 1) oui 2) alternative (scraper IG via proxy) rejetée — ToS + ban, le flux manuel + README couvre 3) zéro bloquant.
+
 ## 9.0 Course aux 100 concours
 - 36 sources : 14 GN RSS (angles FR/EN, after: pour la fraîcheur, sweepstakes/gift-card), 2 Reddit, 4 annuaires FR (ddj ×5 requêtes, jcb ×5 pages, cdn, tg ×2).
 - Élagué : requêtes mortes (carrier deals, bourse-aux-lots, catégories redondantes, doublon ddj-tablette), EchantillonsClub (archives 100% expirées).

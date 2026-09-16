@@ -60,6 +60,22 @@
       "name": "Concours du Net High-Tech"
     },
     {
+      "id": "cdn-instagram",
+      "type": "html",
+      "parser": "cdn",
+      "url": "https://www.concours-du-net.com/concours-instagram",
+      "lang": "fr",
+      "name": "Concours du Net Instagram"
+    },
+    {
+      "id": "cdn-x",
+      "type": "html",
+      "parser": "cdn",
+      "url": "https://www.concours-du-net.com/concours-x-twitter",
+      "lang": "fr",
+      "name": "Concours du Net X"
+    },
+    {
       "id": "gn-en-promax",
       "type": "rss",
       "url": "https://news.google.com/rss/search?q=win%20iphone%2017%20pro%20max&hl=en-US&gl=US&ceid=US%3Aen",
