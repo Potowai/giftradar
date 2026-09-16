@@ -29,5 +29,9 @@ if (existsSync(dist)) {
   app.get('*', (_req, res) => res.sendFile(path.join(dist, 'index.html')))
 }
 
+export default app
+
 const PORT = Number(process.env.PORT || 4000)
-app.listen(PORT, '0.0.0.0', () => console.log(`giftradar api on :${PORT}`))
+if (process.env.GR_NO_LISTEN !== '1') {
+  app.listen(PORT, '0.0.0.0', () => console.log(`giftradar api on :${PORT}`))
+}
