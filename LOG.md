@@ -42,6 +42,13 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
 
+## 9.0 Course aux 100 concours
+- 36 sources : 14 GN RSS (angles FR/EN, after: pour la fraîcheur, sweepstakes/gift-card), 2 Reddit, 4 annuaires FR (ddj ×5 requêtes, jcb ×5 pages, cdn, tg ×2).
+- Élagué : requêtes mortes (carrier deals, bourse-aux-lots, catégories redondantes, doublon ddj-tablette), EchantillonsClub (archives 100% expirées).
+- Résultat : 20 → **101 entrées** (15× iPhone 18, 68× iPhone 17, 18× Apple), 54 actionnables par défaut + 47 douteux masqués. Intent +sweepstakes.
+- Limite honnête : le pool gratuit trouve ~100 concours Apple non-finis ; au-delà = requêtes redondantes (dédupliquées) ou hors-sujet. Les sources fraîches permanentes (nouveautés jcb, semaine tg) regarniront au fil des jours.
+- Règle 5 : 1) oui (27/27+6/6, build vert) 2) alternative (assouplir les filtres) rejetée — gonflerait avec des finis, contraire à la purge demandée 3) zéro bloquant.
+
 ## 8.0 Thème clair + skill Taste
 - Skill taste (Leonxlnx/taste-skill, 87 Ko) installé et vérifié.
 - Refonte 100% claire « brief du matin » : papier #F6F4EE, encre #1C1A16, indigo #4F46E5, J- thermiques adaptés, manifest/theme-color/barre iOS clairs, color-scheme light.

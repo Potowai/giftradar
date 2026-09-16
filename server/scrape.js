@@ -9,7 +9,7 @@ const STAGGER_MS = 2500
 
 const parser = new Parser({ timeout: TIMEOUT_MS, headers: { 'User-Agent': UA } })
 
-const INTENT = /gagn|win|giveaway|concours|jeu\b|tentez|remport|enter to win|chance|lot|tirage|quiz/i
+const INTENT = /gagn|win|giveaway|concours|jeu\b|tentez|remport|enter to win|chance|lot|tirage|quiz|sweepstake/i
 const PRIZE = /iphone|apple|ipad|airpods|macbook|watch|ios/i
 const NOISE = /retrouv|volé|volée|procès|arrêté|interpellé|escroquerie|arnaque|fake|mort|décès|slammed|slam\b|staging|staged|buys?\s+\d+|bought\s+\d+|lawsuit|sues?\b|arrest/i
 
@@ -253,7 +253,7 @@ export function parseDemonJeu($, base) {
     const org = $el.find('[data-concours-nom]').attr('data-concours-nom') || ''
     $el.find('a[href$=".php"]').each((__, a) => {
       const href = $(a).attr('href') || ''
-      if (!/iphone/i.test(href)) return
+      if (!/iphone|ipad|airpods|watch|macbook|apple/i.test(href)) return
       const slug = href.split('/').pop()
       const prizePart = (slug.match(/gagnez-(.+?)(?:-sur-|-jusqu-au-|\.php)/i) || [])[1] || 'iPhone'
       out.push({
@@ -325,7 +325,37 @@ export function parseCdn($, base, now) {
   return out
 }
 
-const HTML_PARSERS = { ddj: parseDemonJeu, jcb: parseJcb, cdn: parseCdn }
+export function parseTg(html, base) {
+  const out = []
+  const parts = String(html || '').split(/(<a[^>]*href="\/concours\/g\d+\.html"[^>]*>)/i)
+  for (let i = 1; i < parts.length; i += 2) {
+    const linkTag = parts[i]
+    const after = parts[i + 1] || ''
+    const before = parts[i - 1] || ''
+    const href = (linkTag.match(/href="([^"]+)"/i) || [])[1]
+    if (!href) continue
+    const lots = [...before.matchAll(/<p class="lots">(.*?)<\/p>/gis)].pop()
+    const lotsText = (lots ? lots[1].replace(/<[^>]+>/g, ' ') : '').replace(/\s+/g, ' ').trim()
+    if (!/iphone/i.test(lotsText)) continue
+    const fin = (after.match(/termines-le-(\d{2})-(\d{2})-(20\d{2})\.html/i) || [])
+    const deadline = fin[1] ? new Date(Date.UTC(Number(fin[3]), Number(fin[2]) - 1, Number(fin[1]))).toISOString() : null
+    const added = (before.match(/ajoutes-le-(\d{2})-(\d{2})-(20\d{2})\.html/i) || [])
+    const published = added[1] ? new Date(Date.UTC(Number(added[3]), Number(added[2]) - 1, Number(added[1]))).toISOString() : null
+    const plat = (after.match(/title="Jeu-concours sur ([^.]+)\./i) || [])[1] || ''
+    const platform = /instagram/i.test(plat) ? 'instagram' : /facebook/i.test(plat) ? 'facebook' : /twitter/i.test(plat) ? 'x' : 'site'
+    const firstLot = lotsText.replace(/^Au tirage au sort\s*:\s*/i, '').split(/[,;]/)[0].trim().slice(0, 80)
+    out.push({
+      title: `Gagnez ${firstLot} (ToutGagner)`.slice(0, 140),
+      link: new URL(href, base).toString(),
+      isoDate: published,
+      platform,
+      deadline,
+    })
+  }
+  return out
+}
+
+const HTML_PARSERS = { ddj: parseDemonJeu, jcb: parseJcb, cdn: parseCdn, tg: ($, base) => parseTg($.html(), base) }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 

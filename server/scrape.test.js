@@ -19,6 +19,7 @@ import {
   parseDemonJeu,
   parseJcb,
   parseCdn,
+  parseTg,
   canonicalUrl,
   makeId,
   normalize,
@@ -159,6 +160,20 @@ test('parseCdn extrait cartes high-tech', () => {
   assert.equal(out[0].platform, 'instagram')
   assert.equal(out[0].deadline, '2026-09-30T00:00:00.000Z')
   assert.match(out[0].title, /iPhone 18 Pro/)
+})
+
+test('parseTg extrait lots, deadline et plateforme', () => {
+  const html = `<p class="lots"><strong>Au tirage au sort :</strong> 1 iPhone 17 256 Go (999 €), 1 coque</p>
+    <a href="/jeux-concours/ajoutes-le-15-09-2026.html">le 15/09/2026</a>
+    <a class="btn participer" href="/concours/g2211584.html" target="_blank">Participer</a>
+    <p class="datelimite"><a href="/jeux-concours/termines-le-20-09-2026.html">20/09/2026</a></p>
+    <span title="Jeu-concours sur Instagram."><i></i></span>`
+  const out = parseTg(html, 'https://toutgagner.com')
+  assert.equal(out.length, 1)
+  assert.equal(out[0].platform, 'instagram')
+  assert.equal(out[0].deadline, '2026-09-20T00:00:00.000Z')
+  assert.equal(out[0].isoDate, '2026-09-15T00:00:00.000Z')
+  assert.match(out[0].title, /iPhone 17/)
 })
 
 test('canonicalUrl strips tracking params', () => {

@@ -58,6 +58,217 @@
       "url": "https://www.concours-du-net.com/concours-high-tech-multimedia",
       "lang": "fr",
       "name": "Concours du Net High-Tech"
+    },
+    {
+      "id": "gn-en-promax",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=win%20iphone%2017%20pro%20max&hl=en-US&gl=US&ceid=US%3Aen",
+      "lang": "en",
+      "name": "Google News EN Pro Max"
+    },
+    {
+      "id": "gn-fr-gratuit",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=gagner%20iphone%20gratuit&hl=fr&gl=FR&ceid=FR%3Afr",
+      "lang": "fr",
+      "name": "Google News FR gratuit"
+    },
+    {
+      "id": "gn-fr-smart",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=jeu%20concours%20smartphone%20gagner&hl=fr&gl=FR&ceid=FR%3Afr",
+      "lang": "fr",
+      "name": "Google News FR smartphone"
+    },
+    {
+      "id": "ddj-smartphone",
+      "type": "html",
+      "parser": "ddj",
+      "url": "https://www.ledemondujeu.com/concours-recherche.php?motcle=smartphone",
+      "lang": "fr",
+      "name": "Démon du Jeu smartphone"
+    },
+    {
+      "id": "ddj-apple",
+      "type": "html",
+      "parser": "ddj",
+      "url": "https://www.ledemondujeu.com/concours-recherche.php?motcle=apple",
+      "lang": "fr",
+      "name": "Démon du Jeu Apple"
+    },
+    {
+      "id": "tg-smartphones",
+      "type": "html",
+      "parser": "tg",
+      "url": "https://toutgagner.com/jeux-concours/gagner-mobiles-smartphones.html",
+      "lang": "fr",
+      "name": "ToutGagner smartphones"
+    },
+    {
+      "id": "rd-freebies",
+      "type": "rss",
+      "url": "https://www.reddit.com/r/freebies/.rss",
+      "lang": "en",
+      "name": "r/freebies"
+    },
+    {
+      "id": "jcb-ipad",
+      "type": "html",
+      "parser": "jcb",
+      "url": "https://www.jeu-concours.biz/gagner-ipad.html",
+      "lang": "fr",
+      "name": "Jeu-Concours.biz iPad"
+    },
+    {
+      "id": "jcb-watch",
+      "type": "html",
+      "parser": "jcb",
+      "url": "https://www.jeu-concours.biz/gagner-apple-watch.html",
+      "lang": "fr",
+      "name": "Jeu-Concours.biz Watch"
+    },
+    {
+      "id": "gn-en-fresh",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=iphone%20giveaway%20after:2026-08-15&hl=en-US&gl=US&ceid=US%3Aen",
+      "lang": "en",
+      "name": "Google News EN frais"
+    },
+    {
+      "id": "gn-fr-frais",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=concours%20gagner%20iphone%20after:2026-08-15&hl=fr&gl=FR&ceid=FR%3Afr",
+      "lang": "fr",
+      "name": "Google News FR frais"
+    },
+    {
+      "id": "ddj-airpods",
+      "type": "html",
+      "parser": "ddj",
+      "url": "https://www.ledemondujeu.com/concours-recherche.php?motcle=airpods",
+      "lang": "fr",
+      "name": "Démon du Jeu AirPods"
+    },
+    {
+      "id": "ddj-watch",
+      "type": "html",
+      "parser": "ddj",
+      "url": "https://www.ledemondujeu.com/concours-recherche.php?motcle=watch",
+      "lang": "fr",
+      "name": "Démon du Jeu Watch"
+    },
+    {
+      "id": "ddj-ipad",
+      "type": "html",
+      "parser": "ddj",
+      "url": "https://www.ledemondujeu.com/concours-recherche.php?motcle=ipad",
+      "lang": "fr",
+      "name": "Démon du Jeu iPad"
+    },
+    {
+      "id": "jcb-macbook",
+      "type": "html",
+      "parser": "jcb",
+      "url": "https://www.jeu-concours.biz/gagner-macbook.html",
+      "lang": "fr",
+      "name": "Jeu-Concours.biz MacBook"
+    },
+    {
+      "id": "jcb-tablette",
+      "type": "html",
+      "parser": "jcb",
+      "url": "https://www.jeu-concours.biz/gagner-tablette.html",
+      "lang": "fr",
+      "name": "Jeu-Concours.biz tablette"
+    },
+    {
+      "id": "jcb-airpods",
+      "type": "html",
+      "parser": "jcb",
+      "url": "https://www.jeu-concours.biz/gagner-airpods.html",
+      "lang": "fr",
+      "name": "Jeu-Concours.biz AirPods"
+    },
+    {
+      "id": "ddj-montre",
+      "type": "html",
+      "parser": "ddj",
+      "url": "https://www.ledemondujeu.com/concours-recherche.php?motcle=montre",
+      "lang": "fr",
+      "name": "Démon du Jeu montre"
+    },
+    {
+      "id": "ddj-tablette",
+      "type": "html",
+      "parser": "ddj",
+      "url": "https://www.ledemondujeu.com/concours-recherche.php?motcle=tablette",
+      "lang": "fr",
+      "name": "Démon du Jeu tablette"
+    },
+    {
+      "id": "jcb-nouveaux",
+      "type": "html",
+      "parser": "jcb",
+      "url": "https://www.jeu-concours.biz/nouveaux-concours.html",
+      "lang": "fr",
+      "name": "Jeu-Concours.biz nouveautés"
+    },
+    {
+      "id": "tg-derniers",
+      "type": "html",
+      "parser": "tg",
+      "url": "https://toutgagner.com/jeux-concours/derniers-concours-ajoutes.html",
+      "lang": "fr",
+      "name": "ToutGagner derniers"
+    },
+    {
+      "id": "gn-en-pro",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=iphone%2017%20pro%20giveaway%20after:2026-08-20&hl=en-US&gl=US&ceid=US%3Aen",
+      "lang": "en",
+      "name": "Google News EN pro frais"
+    },
+    {
+      "id": "gn-en-pods",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=airpods%20giveaway%20after:2026-08-15&hl=en-US&gl=US&ceid=US%3Aen",
+      "lang": "en",
+      "name": "Google News EN AirPods"
+    },
+    {
+      "id": "gn-en-ipad",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=ipad%20giveaway%20after:2026-08-15&hl=en-US&gl=US&ceid=US%3Aen",
+      "lang": "en",
+      "name": "Google News EN iPad"
+    },
+    {
+      "id": "gn-fr-pods",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=gagner%20airpods%20concours%20after:2026-08-01&hl=fr&gl=FR&ceid=FR%3Afr",
+      "lang": "fr",
+      "name": "Google News FR AirPods"
+    },
+    {
+      "id": "gn-fr-ipad",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=concours%20ipad%20gagner%20after:2026-08-01&hl=fr&gl=FR&ceid=FR%3Afr",
+      "lang": "fr",
+      "name": "Google News FR iPad"
+    },
+    {
+      "id": "gn-en-sweep",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=iphone%20sweepstakes%20after:2026-08-15&hl=en-US&gl=US&ceid=US%3Aen",
+      "lang": "en",
+      "name": "Google News EN sweepstakes"
+    },
+    {
+      "id": "gn-en-giftcard",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=win%20apple%20store%20gift%20card%20after:2026-08-15&hl=en-US&gl=US&ceid=US%3Aen",
+      "lang": "en",
+      "name": "Google News EN gift card"
     }
   ]
 }
