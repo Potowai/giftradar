@@ -50,9 +50,19 @@ Le scan tourne seul : cron `0 8,18 * * *` (modifiable via `SCRAPE_CRON`) + re-sc
 
 ## Veille manuelle (X / Instagram, non scrapables sans compte)
 
-- X : `("iPhone 17 Pro" OR "iPhone 18") (concours OR giveaway) (RT OR tirage) -is:retweet`, onglet Récents.
+- X : `("iPhone 17 Pro" OR "iPhone 18") (concours OR giveaway) (RT OR tirage) -is:retweet`, onglet Récents. Les posts X sont aussi relayés auto via Google News (`gn-x-give`, `gn-x-concours`).
 - Instagram : hashtags #concoursiphone #concoursapple #giveawayfrance + comptes marques (Fnac, Darty, LDLC, opérateurs).
 - Tout lien trouvé → bouton + dans l'app.
 - Alertes : jamais de frais de port / numéro surtaxé / lien Telegram-WhatsApp / coordonnées bancaires (badge « vigilance » si détecté).
+
+## Instagram avec tes cookies (optionnel, version locale uniquement)
+
+Le fetch direct IG exige une session (mur de login prouvé sans). Pour l'activer :
+1. Sur ordinateur, ouvre instagram.com connecté → F12 → Application → Cookies → instagram.com.
+2. Copie les valeurs `sessionid`, `csrftoken`, `ds_user_id`, `mid` au format `nom=valeur; nom=valeur`.
+3. Mets-les dans `.env` : `IG_COOKIES="sessionid=...; csrftoken=...; ds_user_id=...; mid=..."` (jamais commité).
+4. `POST /api/ig {"type":"profile"|"hashtag","query":"...","limit":8}` → entrées normalisées (lecture seule, 1 requête/1.5s).
+5. Le bouton + accepte ensuite les liens instagram.com avec titre auto (mêmes cookies).
+Avertissement : usage perso, lecture seule, fréquence basse — un abus peut faire flagger le compte.
 
 Journal de construction : `LOG.md`.

@@ -5,6 +5,7 @@ import cron from 'node-cron'
 import { readJson, writeJson } from './util.js'
 import { scrapeAll, normalize } from './scrape.js'
 import { fetchOg } from './og.js'
+import { hasSession, scanProfile, scanHashtag, fetchPost } from './instagram.js'
 
 const SCRAPE_CRON = process.env.SCRAPE_CRON || '0 8,18 * * *'
 
@@ -69,6 +70,37 @@ app.post('/api/og', async (req, res) => {
     res.json(await fetchOg(url))
   } catch (e) {
     res.status(502).json({ error: String((e && e.message) || e).slice(0, 200) })
+  }
+})
+
+app.post('/api/ig', async (req, res) => {
+  const { type, query, limit } = req.body || {}
+  if (!hasSession()) return res.status(400).json({ error: 'IG_COOKIES non configuré (voir README)' })
+  if ((type !== 'profile' && type !== 'hashtag') || !query) {
+    return res.status(400).json({ error: 'type profile|hashtag + query requis' })
+  }
+  const now = new Date().toISOString()
+  try {
+    const urls = type === 'profile'
+      ? await scanProfile(query, Math.min(Number(limit) || 8, 12))
+      : await scanHashtag(query, Math.min(Number(limit) || 8, 12))
+    const entries = []
+    for (const url of urls) {
+      try {
+        const code = (url.match(/\/p\/([A-Za-z0-9_-]+)/) || [])[1]
+        const post = await fetchPost(code)
+        const entry = normalize({ title: post.description || post.title, link: url, isoDate: now }, { id: 'instagram', name: `Instagram ${type} ${query}`, lang: 'fr' }, now)
+        entry.platform = 'instagram'
+        if (post.image) entry.image = post.image
+        entries.push(entry)
+      } catch {
+        /* post illisible : on passe */
+      }
+      await new Promise((r) => setTimeout(r, 1500))
+    }
+    res.json({ entries, count: entries.length })
+  } catch (e) {
+    res.status(502).json({ error: String((e && e.message) || e).slice(0, 300) })
   }
 })
 

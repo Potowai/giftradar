@@ -27,9 +27,15 @@ export async function fetchOg(url) {
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
   try {
+    const headers = { 'User-Agent': UA, Accept: 'text/html' }
+    try {
+      if (new URL(String(url)).hostname.includes('instagram.com') && process.env.IG_COOKIES) {
+        headers.Cookie = process.env.IG_COOKIES
+      }
+    } catch { /* url invalide */ }
     const r = await fetch(String(url), {
       signal: ctrl.signal,
-      headers: { 'User-Agent': UA, Accept: 'text/html' },
+      headers,
       redirect: 'follow',
     })
     if (!r.ok) throw new Error(`http ${r.status}`)

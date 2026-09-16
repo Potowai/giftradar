@@ -42,6 +42,12 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
 
+## 12.0 X via readers + IG à cookies
+- Readers X : twstalker 403, xcancel 451, nitter mort, syndication morte, xstalk mort. MAIS Google News indexe les posts X → sources gn-x-give (21) + gn-x-concours (5), plateforme détectée via titre (« - x.com », Follow+RT).
+- Instagram : plomberie cookies prête (server/instagram.js, POST /api/ig, og.js enrichi, 4 tests). En attente de la chaîne IG_COOKIES de l'utilisateur pour validation live.
+- Résultat : 127 entrées (59 site, 34 IG, 8 FB, 26 X). Tests 32/32.
+- Règle 5 : 1) oui 2) alternative (session partagée codée en dur) rejetée — .env gitignoré uniquement 3) zéro bloquant.
+
 ## 11.0 Fetch direct IG/X : testé, impossible en gratuit
 - Instagram sans session : mur de login (titre générique, 0 donnée post). X sans login : redirect auth-wall (302). API X payante (~200$/mois), Graph API IG réservée aux comptes possédés.
 - Seule voie technique (cookies de session perso) = fragile + violation ToS + risque de ban du compte servant à participer → refusé.

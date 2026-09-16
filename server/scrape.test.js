@@ -59,6 +59,12 @@ test('detectPlatform maps domains', () => {
   assert.equal(detectPlatform('https://www.macrumors.com/x'), 'site')
 })
 
+test('detectPlatform lit les indices X dans le titre', () => {
+  assert.equal(detectPlatform('https://news.google.com/rss/articles/xyz', '#iphone18 #giveaway @team - x.com'), 'x')
+  assert.equal(detectPlatform('https://news.google.com/rss/articles/xyz', 'Giveaway iPhone 18 Pro Max Follow @a Like & RT Tag a friend'), 'x')
+  assert.equal(detectPlatform('https://news.google.com/rss/articles/xyz', 'MacRumors Giveaway: Win an iPhone 17'), 'site')
+})
+
 test('keepItem requires intent + prize, drops noise', () => {
   assert.equal(keepItem('MacRumors Giveaway: Win an iPhone 17'), true)
   assert.equal(keepItem('Jeu concours : tentez de gagner un iPhone 17'), true)

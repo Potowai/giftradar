@@ -285,6 +285,20 @@
       "url": "https://news.google.com/rss/search?q=win%20apple%20store%20gift%20card%20after:2026-08-15&hl=en-US&gl=US&ceid=US%3Aen",
       "lang": "en",
       "name": "Google News EN gift card"
+    },
+    {
+      "id": "gn-x-give",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=iphone%20giveaway%20site:x.com%20after:2026-08-15&hl=en-US&gl=US&ceid=US%3Aen",
+      "lang": "en",
+      "name": "Google News X posts EN"
+    },
+    {
+      "id": "gn-x-concours",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=concours%20iphone%20site:x.com%20after:2026-08-01&hl=fr&gl=FR&ceid=FR%3Afr",
+      "lang": "fr",
+      "name": "Google News X posts FR"
     }
   ]
 }

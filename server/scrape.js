@@ -138,13 +138,15 @@ export function slugPlatform(slug) {
   return 'site'
 }
 
-export function detectPlatform(url) {
+export function detectPlatform(url, title = '') {
   const u = String(url || '').toLowerCase()
+  const t = String(title || '')
   if (u.includes('instagram.com')) return 'instagram'
   if (u.includes('youtube.com') || u.includes('youtu.be')) return 'youtube'
   if (u.includes('tiktok.com')) return 'tiktok'
   if (u.includes('facebook.com')) return 'facebook'
   if (u.includes('x.com') || u.includes('twitter.com')) return 'x'
+  if (/\s-\s(x\.com|twitter)\.?$/i.test(t) || /follow @\w+.*\b(RT|repost)\b/i.test(t)) return 'x'
   return 'site'
 }
 
@@ -197,7 +199,7 @@ export function normalize(item, source, now) {
   const url = canonicalUrl(item.link || item.url || '')
   const prize = detectTier(title)
   const language = detectLanguage(title, source.lang)
-  const platform = item.platform || detectPlatform(url)
+  const platform = item.platform || detectPlatform(url, title)
   const deadline = item.deadline || detectDeadline(title)
   return {
     id: makeId(title, url),
