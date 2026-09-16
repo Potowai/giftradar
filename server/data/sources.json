@@ -299,6 +299,22 @@
       "url": "https://news.google.com/rss/search?q=concours%20iphone%20site:x.com%20after:2026-08-01&hl=fr&gl=FR&ceid=FR%3Afr",
       "lang": "fr",
       "name": "Google News X posts FR"
+    },
+    {
+      "id": "cdn-facebook",
+      "type": "html",
+      "parser": "cdn",
+      "url": "https://www.concours-du-net.com/concours-facebook",
+      "lang": "fr",
+      "name": "Concours du Net Facebook"
+    },
+    {
+      "id": "ddj-cat-facebook",
+      "type": "html",
+      "parser": "ddj",
+      "url": "https://www.ledemondujeu.com/concours-facebook-1.html",
+      "lang": "fr",
+      "name": "Démon du Jeu cat. Facebook"
     }
   ]
 }

@@ -42,6 +42,12 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
 
+## 15.0 Concours Facebook
+- Ajouté : cdn-facebook + ddj-cat-facebook (standing, 0 Apple inédit aujourd'hui — tout est déjà couvert par recherche par lot).
+- Total FB : 8 (ugreen, leroiduparebrise…). GN facebook-only : quasi vide, ignoré.
+- Facebook direct : 302 mur de login (comme IG) → pas de fetch direct.
+- Règle 5 : 1) oui (tests+build ci-dessous) 2) alternative (page par marque FB) rejetée — redondant avec recherche par lot 3) zéro bloquant.
+
 ## 14.0 Cookies IG testés : session OK, contenu verrouillé
 - Cookies utilisateur valides (mur login levé : profil @apple 38M followers lisible).
 - MAIS : coquilles vides, 0 shortcode, 0 JSON timeline — le contenu exige l'API interne IG (clés rotatives) → renoncé (fragile + risque ban du compte utilisateur).
