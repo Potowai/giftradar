@@ -42,6 +42,12 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
 
+## 14.0 Cookies IG testés : session OK, contenu verrouillé
+- Cookies utilisateur valides (mur login levé : profil @apple 38M followers lisible).
+- MAIS : coquilles vides, 0 shortcode, 0 JSON timeline — le contenu exige l'API interne IG (clés rotatives) → renoncé (fragile + risque ban du compte utilisateur).
+- Cookies utilisés en mémoire uniquement, traces /tmp détruites, RIEN commité, secret GH non posé (inutile sans fetch fonctionnel).
+- Couverture IG inchangée : relais humains (34 entrées) + ajout manuel.
+
 ## 13.0 IG 100% mobile (secret GitHub)
 - Utilisateur mobile-only → pas de .env local possible. Solution : cookies collés en secret Actions IG_COOKIES (via Safari iPhone), script scripts/scrape-ig.mjs branché dans le workflow après le snapshot (garde propre sans cookies).
 - Watchlist : hashtags concoursiphone/concoursapple/giveawayfrance (+ profils, vide pour l'instant), 6 posts/source, 1.5s d'intervalle, fusion dédupliquée dans le snapshot.
