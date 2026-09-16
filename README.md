@@ -55,14 +55,23 @@ Le scan tourne seul : cron `0 8,18 * * *` (modifiable via `SCRAPE_CRON`) + re-sc
 - Tout lien trouvé → bouton + dans l'app.
 - Alertes : jamais de frais de port / numéro surtaxé / lien Telegram-WhatsApp / coordonnées bancaires (badge « vigilance » si détecté).
 
-## Instagram avec tes cookies (optionnel, version locale uniquement)
+## Instagram avec tes cookies (100% mobile, sans ordinateur)
 
-Le fetch direct IG exige une session (mur de login prouvé sans). Pour l'activer :
-1. Sur ordinateur, ouvre instagram.com connecté → F12 → Application → Cookies → instagram.com.
-2. Copie les valeurs `sessionid`, `csrftoken`, `ds_user_id`, `mid` au format `nom=valeur; nom=valeur`.
-3. Mets-les dans `.env` : `IG_COOKIES="sessionid=...; csrftoken=...; ds_user_id=...; mid=..."` (jamais commité).
-4. `POST /api/ig {"type":"profile"|"hashtag","query":"...","limit":8}` → entrées normalisées (lecture seule, 1 requête/1.5s).
-5. Le bouton + accepte ensuite les liens instagram.com avec titre auto (mêmes cookies).
-Avertissement : usage perso, lecture seule, fréquence basse — un abus peut faire flagger le compte.
+Le fetch direct IG exige une session (mur de login prouvé sans). Tout se fait depuis l'iPhone :
+
+**1. Récupérer tes cookies (5 min, une fois)**
+1. Installe l'app gratuite **Inspect Browser** (navigateur avec outils dev sur iOS).
+2. Dedans, connecte-toi sur instagram.com (ton compte habituel).
+3. Ouvre les DevTools → onglet **Storage/Application → Cookies → instagram.com**.
+4. Copie les valeurs `sessionid`, `csrftoken`, `ds_user_id`, `mid` et assemble : `sessionid=...; csrftoken=...; ds_user_id=...; mid=...`
+
+**2. Les donner au robot (2 min, depuis Safari)**
+1. Sur github.com (connecté), ouvre le repo `Potowai/giftradar` → **Settings → Secrets and variables → Actions → New repository secret**.
+2. Nom : `IG_COOKIES`, valeur : ta chaîne de l'étape 1 → Add secret.
+3. C'est tout : au prochain scan (08h/18h UTC, ou via l'onglet Actions → Refresh contest snapshot → Run), le robot scannera les hashtags `#concoursiphone #concoursapple #giveawayfrance` (+ profils listés dans `server/data/ig-watch.json`) et fusionnera les concours trouvés dans le feed.
+
+**En local** (si un jour tu as une machine) : même chaîne dans `.env` → `IG_COOKIES="..."`, puis `POST /api/ig {"type":"profile"|"hashtag","query":"..."}`. Le bouton + accepte aussi les liens instagram.com avec titre auto.
+
+Avertissement : usage perso, lecture seule, fréquence basse — un abus peut faire flagger le compte. Les cookies expirent à la déconnexion : il suffit de les regénérer.
 
 Journal de construction : `LOG.md`.

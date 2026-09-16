@@ -19,6 +19,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run scrape
+      - run: npm run scrape:ig
+        env:
+          IG_COOKIES: ${{ secrets.IG_COOKIES }}
       - name: Commit snapshot if changed
         run: |
           git config user.name "giftradar-bot"
