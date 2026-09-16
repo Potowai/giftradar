@@ -1,9 +1,32 @@
 import express from 'express'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
+import cron from 'node-cron'
 import { readJson, writeJson } from './util.js'
 import { scrapeAll, normalize } from './scrape.js'
 import { fetchOg } from './og.js'
+
+const SCRAPE_CRON = process.env.SCRAPE_CRON || '0 8,18 * * *'
+
+async function autoScrape(reason) {
+  try {
+    const r = await scrapeAll()
+    console.log(`[cron:${reason}] ${r.feed.length} entrées`)
+  } catch (e) {
+    console.error(`[cron:${reason}] échec:`, String((e && e.message) || e).slice(0, 200))
+  }
+}
+
+if (process.env.GR_NO_LISTEN !== '1') {
+  cron.schedule(SCRAPE_CRON, () => void autoScrape('cron'))
+
+  const bootFeed = await readJson('feed.json', [])
+  const bootMeta = await readJson('meta.json', {})
+  const staleMs = Date.now() - Date.parse(bootMeta.scraped_at || 0)
+  if (!Array.isArray(bootFeed) || bootFeed.length === 0 || Number.isNaN(staleMs) || staleMs > 6 * 3600 * 1000) {
+    void autoScrape('boot')
+  }
+}
 
 const app = express()
 app.use(express.json({ limit: '256kb' }))

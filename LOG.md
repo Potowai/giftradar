@@ -30,3 +30,8 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - App : onglet Terminés avec "Remettre à faire", PullToRefresh, Toasts, dialogue Ajouter → POST /api/entries + refresh, toggle "Faits".
 - store.test.ts : 6/6. Serveur 13/13. Build vert, PWA vérifiée (manifest standalone FR, sw.js + workbox générés).
 - Règle 5 : 1) oui (tsc+build+tests ci-dessus) 2) alternative (swipe-undo) reportée — bouton "Remettre à faire" suffit pour v1 3) doute : pas de test sur vrai iPhone (émulateur indisponible ici) → mitigé par build PWA standard + meta viewport ; à valider demain sur le téléphone → point ouvert assumé, seul restant.
+
+## 4.0 Scheduler + docs (Phase 4)
+- node-cron 08h00/18h00 (SCRAPE_CRON surchargeable) + re-scan au boot si feed vide ou >6h. Gardé hors tests (GR_NO_LISTEN).
+- README complet : install, accès iPhone en LAN, usage quotidien, API, données.
+- Règle 5 : 1) à vérifier (build+tests ci-dessous) 2) alternative (cron système) rejetée — node-cron = zéro config, suit le serveur 3) doute : si la machine dort, pas de scan — noté dans README (lane "machine allumée") → accepté, zéro bloquant.
