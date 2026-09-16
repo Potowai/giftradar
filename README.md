@@ -60,10 +60,8 @@ Le scan tourne seul : cron `0 8,18 * * *` (modifiable via `SCRAPE_CRON`) + re-sc
 Le fetch direct IG exige une session (mur de login prouvé sans). Tout se fait depuis l'iPhone :
 
 **1. Récupérer tes cookies (5 min, une fois)**
-1. Installe l'app gratuite **Inspect Browser** (navigateur avec outils dev sur iOS).
-2. Dedans, connecte-toi sur instagram.com (ton compte habituel).
-3. Ouvre les DevTools → onglet **Storage/Application → Cookies → instagram.com**.
-4. Copie les valeurs `sessionid`, `csrftoken`, `ds_user_id`, `mid` et assemble : `sessionid=...; csrftoken=...; ds_user_id=...; mid=...`
+- **Android (ton cas)** : installe **Kiwi Browser** (Play Store, gratuit) → menu ⋮ → Extensions → cherche **Cookie-Editor** → Ajouter. Ouvre instagram.com dans Kiwi, connecte-toi, puis ouvre Cookie-Editor → **Export → Header String** → Copier. Tu obtiens une longue ligne `sessionid=...; csrftoken=...; ...` — colle-la telle quelle.
+- **iPhone** : app **Inspect Browser** → instagram.com connecté → DevTools → Cookies → assemble `sessionid=...; csrftoken=...; ds_user_id=...; mid=...`.
 
 **2. Les donner au robot (2 min, depuis Safari)**
 1. Sur github.com (connecté), ouvre le repo `Potowai/giftradar` → **Settings → Secrets and variables → Actions → New repository secret**.
