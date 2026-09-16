@@ -1,26 +1,26 @@
 :root {
-  --gr-bg: #0b0e1a;
-  --gr-surface: #151b31;
-  --gr-surface-2: #1c2340;
-  --gr-border: rgba(255, 255, 255, 0.09);
-  --gr-text: #f1f4ff;
-  --gr-muted: #9aa3c0;
-  --gr-accent: #6a5cff;
-  --gr-hot: #ff4d6d;
-  --gr-warm: #ffb020;
-  --gr-ok: #34d399;
+  --gr-bg: #f6f4ee;
+  --gr-surface: #ffffff;
+  --gr-surface-2: #ece7db;
+  --gr-border: rgba(28, 26, 22, 0.14);
+  --gr-text: #1c1a16;
+  --gr-muted: #6b645a;
+  --gr-accent: #4f46e5;
+  --gr-hot: #b42342;
+  --gr-warm: #8a5200;
+  --gr-ok: #0e7a4d;
 
-  --adm-color-primary: #6a5cff;
-  --adm-color-success: #34d399;
-  --adm-color-danger: #ff4d6d;
-  --adm-color-text: #f1f4ff;
-  --adm-color-weak: #9aa3c0;
-  --adm-color-background: #0b0e1a;
-  --adm-color-border: rgba(255, 255, 255, 0.09);
+  --adm-color-primary: #4f46e5;
+  --adm-color-success: #0e7a4d;
+  --adm-color-danger: #b42342;
+  --adm-color-text: #1c1a16;
+  --adm-color-weak: #6b645a;
+  --adm-color-background: #f6f4ee;
+  --adm-color-border: rgba(28, 26, 22, 0.14);
   --adm-font-family: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   font-family: var(--adm-font-family);
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -70,6 +70,7 @@ body {
   background: var(--gr-surface);
   border: 1px solid var(--gr-border);
   border-radius: 18px;
+  box-shadow: 0 1px 3px rgba(28, 26, 22, 0.07);
 }
 
 .gr-card .adm-card-header {
@@ -112,22 +113,22 @@ body {
 }
 
 .gr-j-cool {
-  background: rgba(124, 108, 255, 0.16);
-  color: #b9b1ff;
+  background: rgba(79, 70, 229, 0.12);
+  color: #4338ca;
 }
 
 .gr-j-warm {
-  background: rgba(255, 176, 32, 0.16);
+  background: rgba(138, 82, 0, 0.12);
   color: var(--gr-warm);
 }
 
 .gr-j-hot {
-  background: rgba(255, 77, 109, 0.18);
-  color: #ff8ba0;
+  background: rgba(180, 35, 66, 0.12);
+  color: var(--gr-hot);
 }
 
 .gr-j-none {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(28, 26, 22, 0.06);
   color: var(--gr-muted);
   font-weight: 500;
 }
@@ -151,24 +152,24 @@ body {
 }
 
 .gr-tag-world {
-  background: rgba(52, 211, 153, 0.15);
-  color: #6ee7a8;
+  background: rgba(14, 122, 77, 0.12);
+  color: var(--gr-ok);
 }
 
 .gr-tag-fr {
-  background: rgba(106, 92, 255, 0.18);
-  color: #b9b1ff;
+  background: rgba(79, 70, 229, 0.12);
+  color: #4338ca;
 }
 
 .gr-tag-near {
-  background: rgba(255, 77, 109, 0.16);
-  color: #ff8ba0;
+  background: rgba(180, 35, 66, 0.1);
+  color: var(--gr-hot);
 }
 
 .gr-tag-risk {
-  background: rgba(255, 140, 0, 0.16);
-  color: #ffb37a;
-  border: 1px solid rgba(255, 140, 0, 0.4);
+  background: rgba(138, 82, 0, 0.12);
+  color: var(--gr-warm);
+  border: 1px solid rgba(138, 82, 0, 0.4);
 }
 
 .gr-open-btn {

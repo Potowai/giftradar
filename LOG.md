@@ -42,6 +42,12 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
 
+## 8.0 Thème clair + skill Taste
+- Skill taste (Leonxlnx/taste-skill, 87 Ko) installé et vérifié.
+- Refonte 100% claire « brief du matin » : papier #F6F4EE, encre #1C1A16, indigo #4F46E5, J- thermiques adaptés, manifest/theme-color/barre iOS clairs, color-scheme light.
+- A11y : 9/9 contrastes AA calculés (5.31 à 15.80). tsc+build+26+6 verts.
+- Règle 5 : 1) oui 2) alternative (double thème sombre/clair) rejetée — consigne stricte : clair uniquement 3) zéro bloquant.
+
 ## 7.0 Redesign « radar nocturne » (skills)
 - Spec docs/redesign.md (impeccable + ui-ux-pro-max : palette night-indigo, Outfit single-family, motion unique).
 - J- thermique (hot ≤3j / warm ≤7j), tokens --gr-*, thème antd via --adm-*, stagger d'entrée, reduced-motion respecté.
