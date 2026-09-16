@@ -36,6 +36,8 @@ export interface Contest {
   discovered_at: string
   seen_latest: string
   image?: string
+  stale?: boolean
+  published?: string | null
 }
 
 export interface StateEntry {

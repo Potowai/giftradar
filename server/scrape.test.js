@@ -7,6 +7,10 @@ import {
   detectGeo,
   detectPlatform,
   keepItem,
+  isFinished,
+  isStale,
+  isAncient,
+  titleKey,
   canonicalUrl,
   makeId,
   normalize,
@@ -53,6 +57,46 @@ test('keepItem requires intent + prize, drops noise', () => {
   assert.equal(keepItem('Weather today in Nantes'), false)
 })
 
+test('isFinished drops ended contests, keeps last-chance', () => {
+  assert.equal(isFinished('[Terminé] ActivityTracker : 5 codes à gagner'), true)
+  assert.equal(isFinished('*TERMINÉ* One FM offre l’iPhone 17'), true)
+  assert.equal(isFinished('Giveaway has ended: winners announced'), true)
+  assert.equal(isFinished('9to5Rewards: Last chance to win iPhone 17 Pro'), false)
+  assert.equal(isFinished('Tentez de gagner un iPhone 17, fin le 30 septembre 2026'), false)
+})
+
+test('keepItem drops finished contests', () => {
+  assert.equal(keepItem('[Terminé] Jeu concours : gagnez un iPhone 17'), false)
+  assert.equal(keepItem('TOP JEU - Tentez de gagner un iPhone 17'), true)
+})
+
+test('isStale flags old undated items only', () => {
+  const now = Date.parse('2026-09-16T12:00:00Z')
+  assert.equal(isStale('2026-06-01T00:00:00Z', now), true)
+  assert.equal(isStale('2026-08-01T00:00:00Z', now), false)
+  assert.equal(isStale('2026-09-10T00:00:00Z', now), false)
+  assert.equal(isStale(null, now), false)
+})
+
+test('isAncient flags 6+ month old items', () => {
+  const now = Date.parse('2026-09-16T12:00:00Z')
+  assert.equal(isAncient('2026-01-01T00:00:00Z', now), true)
+  assert.equal(isAncient('2026-06-01T00:00:00Z', now), false)
+  assert.equal(isAncient(null, now), false)
+})
+
+test('keepItem drops staged/fake-news stories', () => {
+  assert.equal(keepItem('Influencer slammed for staging iPhone giveaway in Vietnam'), false)
+  assert.equal(keepItem('Ivana Alawi buys 100 iPhones for fan giveaway'), false)
+  assert.equal(keepItem('Win an iPhone 17 + AirPods 4 | OLBG Prizes Giveaway'), true)
+})
+
+test('titleKey normalizes for dedupe', () => {
+  const a = titleKey('Win an iPhone 18! Get 25% Off - PR Newswire')
+  const b = titleKey('win an iphone 18  get 25% off - star beacon')
+  assert.equal(a, b)
+})
+
 test('canonicalUrl strips tracking params', () => {
   assert.equal(canonicalUrl('https://x.com/a?utm_source=rss#frag'), 'https://x.com/a')
 })
@@ -76,4 +120,5 @@ test('normalize builds a full Contest', () => {
   assert.equal(e.url, 'https://www.europe1.fr/jeu')
   assert.ok(Array.isArray(e.steps) && e.steps.length > 0)
   assert.equal(e.kind, 'auto')
+  assert.equal(e.stale, false)
 })

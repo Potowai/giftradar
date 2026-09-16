@@ -113,6 +113,7 @@ export function App() {
   const [q, setQ] = useState('')
   const [geo, setGeo] = useState<GeoScope | ''>('')
   const [hideDone, setHideDone] = useState(false)
+  const [showStale, setShowStale] = useState(false)
   const [tab, setTab] = useState('open')
   const [addOpen, setAddOpen] = useState(false)
   const [url, setUrl] = useState('')
@@ -133,12 +134,18 @@ export function App() {
     window.open(c.url, '_blank')
   }
 
+  const staleCount = useMemo(() => contests.filter(c => c.stale).length, [contests])
+
   const filtered = useMemo(() =>
     contests
+      .filter(c => showStale || !c.stale)
       .filter(c => !geo || c.geo.scope === geo)
       .filter(c => !q || (c.title + ' ' + c.prize.name).toLowerCase().includes(q.toLowerCase()))
-      .sort((a, b) => (daysUntil(a.deadline) ?? 999) - (daysUntil(b.deadline) ?? 999)),
-    [contests, geo, q],
+      .sort((a, b) =>
+        (Number(!!a.stale) - Number(!!b.stale)) ||
+        ((daysUntil(a.deadline) ?? 999) - (daysUntil(b.deadline) ?? 999)),
+      ),
+    [contests, geo, q, showStale],
   )
 
   const undone = useMemo(() => filtered.filter(c => !isDone(c)), [filtered, store])
@@ -174,6 +181,14 @@ export function App() {
         <Button size="small" fill={hideDone ? 'solid' : 'outline'} color="primary" onClick={() => setHideDone(!hideDone)}>Faits</Button>
       </div>
 
+      {staleCount > 0 && (
+        <div style={{ margin: '0 8px 4px' }}>
+          <Button block fill="outline" size="mini" onClick={() => setShowStale(!showStale)}>
+            {showStale ? 'Masquer les douteux' : `Afficher ${staleCount} douteux (à vérifier) ⚠`}
+          </Button>
+        </div>
+      )}
+
       <Selector
         options={[
           { label: 'Tous', value: '' }, { label: 'Nantes', value: 'nantes' },
@@ -206,7 +221,7 @@ export function App() {
               extra={<Space wrap><Badge color="#7b2ff7" content={PLATFORM_LABEL[c.platform]} /><Badge color={c.geo.scope === 'world' ? '#3ddc97' : '#ff4d6d'} content={GEO_LABEL[c.geo.scope]} /></Space>}
             >
                 <b>{c.title}</b>
-                <div style={{ opacity: 0.6, fontSize: 13, marginTop: 4 }}>échéance : {countdown(daysUntil(c.deadline))} · {c.language === 'fr' ? 'FR' : c.language === 'en' ? 'EN' : '?'} · pas de participation (Instagram/Site)</div>
+                <div style={{ opacity: 0.6, fontSize: 13, marginTop: 4 }}>échéance : {countdown(daysUntil(c.deadline))} · {c.language === 'fr' ? 'FR' : c.language === 'en' ? 'EN' : '?'} · pas de participation (Instagram/Site){c.stale ? ' · ⚠ à vérifier' : ''}</div>
                 {c.steps.length > 0 && (
                   <div style={{ marginTop: 10 }}>
                     <Space style={{ width: '100%', marginBottom: 6 }} align="center">

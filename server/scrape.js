@@ -10,7 +10,20 @@ const parser = new Parser({ timeout: TIMEOUT_MS, headers: { 'User-Agent': UA } }
 
 const INTENT = /gagn|win|giveaway|concours|jeu\b|tentez|remporter|enter to win|chance|lot|tirage|quiz/i
 const PRIZE = /iphone|apple|ipad|airpods|macbook|watch|ios/i
-const NOISE = /retrouv|volé|volée|procès|arrêté|interpellé|escroquerie|arnaque|fake|mort|décès/i
+const NOISE = /retrouv|volé|volée|procès|arrêté|interpellé|escroquerie|arnaque|fake|mort|décès|slammed|slam\b|staging|staged|buys?\s+\d+|bought\s+\d+|lawsuit|sues?\b|arrest/i
+
+export function titleKey(title) {
+  return String(title || '')
+    .toLowerCase()
+    .replace(/[\s_]+/g, ' ')
+    .replace(/\s*[–—\-|:]\s*[^-–—|:]{1,40}$/, '')
+    .replace(/[^a-z0-9àâäéèêëîïôöùûüç ]/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+const FINISHED = /\[terminé\]|\(terminé\)|\*terminé[es]?\*|\bterminé[es]?\b\s*[:!.–—-]*$|has ended|have ended|\bended\b|\bclosed\b|expired|winners?\s+announced|gagnants?\s+annoncé|résultats?\s+(connus|dévoilés|disponibles)|tirage\s+effectué/i
+const STALE_DAYS = 60
+const DROP_DAYS = 180
 
 const TIER_18 = /iphone\s*1\s*8|iphone\s*eighteen/i
 const TIER_17 = /iphone\s*1\s*7|iphone\s*seventeen/i
@@ -88,11 +101,33 @@ export function detectPlatform(url) {
   return 'site'
 }
 
+export function isFinished(title) {
+  return FINISHED.test(String(title || ''))
+}
+
 export function keepItem(title) {
   const t = String(title || '')
   if (!t || t.length < 12) return false
   if (NOISE.test(t)) return false
+  if (isFinished(t)) return false
   return INTENT.test(t) && PRIZE.test(t)
+}
+
+export function ageDays(pubIso, nowMs) {
+  if (!pubIso) return null
+  const t = Date.parse(pubIso)
+  if (Number.isNaN(t)) return null
+  return (nowMs - t) / 86400000
+}
+
+export function isStale(pubIso, nowMs) {
+  const a = ageDays(pubIso, nowMs)
+  return a !== null && a > STALE_DAYS
+}
+
+export function isAncient(pubIso, nowMs) {
+  const a = ageDays(pubIso, nowMs)
+  return a !== null && a > DROP_DAYS
 }
 
 export function canonicalUrl(url) {
@@ -116,6 +151,7 @@ export function normalize(item, source, now) {
   const prize = detectTier(title)
   const language = detectLanguage(title, source.lang)
   const platform = detectPlatform(url)
+  const deadline = detectDeadline(title)
   return {
     id: makeId(title, url),
     title,
@@ -124,7 +160,9 @@ export function normalize(item, source, now) {
     platform,
     language,
     geo: detectGeo(title, url, source.lang),
-    deadline: detectDeadline(title) || (item.isoDate ? new Date(item.isoDate).toISOString() : null),
+    deadline,
+    published: item.isoDate ? new Date(item.isoDate).toISOString() : null,
+    stale: !deadline && isStale(item.isoDate, Date.parse(now)),
     source: source.name || source.id,
     kind: 'auto',
     steps: STEPS[platform] || STEPS.site,
@@ -147,6 +185,7 @@ export async function scrapeAll() {
   const seen = new Map()
   const health = []
 
+  const seenTitles = new Set()
   for (const source of sources || []) {
     try {
       const items = await fetchFeed(source)
@@ -156,6 +195,9 @@ export async function scrapeAll() {
         if (!keepItem(title)) continue
         const entry = normalize(item, source, now)
         if (!entry.url || seen.has(entry.url)) continue
+        const dkey = `${entry.prize.tier}|${(entry.published || '').slice(0, 10)}|${titleKey(title).slice(0, 25)}`
+        if (seenTitles.has(dkey)) continue
+        seenTitles.add(dkey)
         seen.set(entry.url, entry)
         kept++
       }
@@ -168,10 +210,18 @@ export async function scrapeAll() {
 
   const previous = await readJson('feed.json', [])
   const prevById = new Map((Array.isArray(previous) ? previous : []).map((e) => [e.id, e]))
-  const feed = [...seen.values()].map((e) => {
-    const old = prevById.get(e.id)
-    return old ? { ...e, discovered_at: old.discovered_at } : e
-  })
+  const todayStart = new Date(now)
+  todayStart.setUTCHours(0, 0, 0, 0)
+  const feed = [...seen.values()]
+    .filter((e) => {
+      if (!e.deadline) return !isAncient(e.published, Date.parse(now))
+      const d = Date.parse(e.deadline)
+      return Number.isNaN(d) || d >= todayStart.getTime()
+    })
+    .map((e) => {
+      const old = prevById.get(e.id)
+      return old ? { ...e, discovered_at: old.discovered_at } : e
+    })
 
   await writeJson('feed.json', feed)
   await writeJson('health.json', health)
