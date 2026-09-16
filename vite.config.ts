@@ -6,6 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   root: 'web',
   publicDir: 'public',
+  base: './',
   plugins: [
     react(),
     VitePWA({
@@ -18,11 +19,12 @@ export default defineConfig({
         theme_color: '#0b1020',
         background_color: '#0b1020',
         display: 'standalone',
-        start_url: '/',
+        start_url: './',
+        scope: './',
         lang: 'fr',
         icons: [
           {
-            src: '/icon.svg',
+            src: 'icon.svg',
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any',

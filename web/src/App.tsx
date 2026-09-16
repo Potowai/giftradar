@@ -6,15 +6,46 @@ import { loadStore, markOpened, saveStore, Store, toggleStep, unmark } from './s
 let sample: Contest[] = []
 let sampleLoaded = false
 
+const LOCAL_MANUAL_KEY = 'gr:manual'
+
+function hashId(s: string): string {
+  let h = 5381
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0
+  return h.toString(16).padStart(8, '0')
+}
+
+function loadLocalManual(): Contest[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_MANUAL_KEY)
+    const list = raw ? JSON.parse(raw) : []
+    return Array.isArray(list) ? list : []
+  } catch { return [] }
+}
+
+function saveLocalManual(list: Contest[]) {
+  try { localStorage.setItem(LOCAL_MANUAL_KEY, JSON.stringify(list)) } catch { /* ignore */ }
+}
+
 async function getFeed(): Promise<Contest[]> {
   if (sampleLoaded) return sample
+  const local = loadLocalManual()
   try {
     const r = await fetch('/api/feed')
+    if (!r.ok) throw new Error('api')
     const j = await r.json()
     const list: Contest[] = Array.isArray(j.feed) ? j.feed : []
-    if (list.length) { sample = list; sampleLoaded = true }
-    return list
-  } catch { return sample }
+    sample = [...local, ...list.filter(c => !local.some(l => l.url === c.url))]
+    sampleLoaded = true
+    return sample
+  } catch { /* static hosting : snapshot embarqué */ }
+  try {
+    const r = await fetch('feed.snapshot.json')
+    const j = await r.json()
+    const list: Contest[] = Array.isArray(j.feed) ? j.feed : []
+    sample = [...local, ...list.filter(c => !local.some(l => l.url === c.url))]
+    sampleLoaded = true
+    return sample
+  } catch { return [...local, ...sample] }
 }
 
 async function refreshFeed(): Promise<Contest[]> {
@@ -23,16 +54,41 @@ async function refreshFeed(): Promise<Contest[]> {
   return getFeed()
 }
 
-async function postEntry(url: string): Promise<{ ok: boolean; title?: string }> {
+async function postEntry(url: string): Promise<{ ok: boolean; title?: string; local?: boolean }> {
   try {
     const r = await fetch('/api/entries', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url, platform: 'instagram' }),
     })
-    if (!r.ok) return { ok: false }
+    if (!r.ok) throw new Error('api')
     const j = await r.json()
     return { ok: true, title: j.title }
+  } catch { /* static : entrée 100% locale */ }
+  try {
+    const now = new Date().toISOString()
+    const entry: Contest = {
+      id: 'm' + hashId(url),
+      title: url,
+      url,
+      prize: { name: 'Concours (lien)', tier: 'other' },
+      platform: 'instagram',
+      language: 'fr',
+      geo: { scope: 'unknown' },
+      deadline: null,
+      source: 'Ajout manuel',
+      kind: 'manual',
+      steps: [{ label: 'Ouvrir et participer' }],
+      discovered_at: now,
+      seen_latest: now,
+    }
+    const local = loadLocalManual()
+    if (!local.some(l => l.url === url)) {
+      local.push(entry)
+      saveLocalManual(local)
+    }
+    sampleLoaded = false
+    return { ok: true, title: 'lien enregistré (local)', local: true }
   } catch {
     return { ok: false }
   }

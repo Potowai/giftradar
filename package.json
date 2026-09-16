@@ -13,6 +13,7 @@
     "build": "npm run typecheck && vite build",
     "start": "node server/index.js",
     "preview": "vite preview",
+    "scrape": "node scripts/scrape-snapshot.mjs",
     "test": "npm run test:server && npm run test:web",
     "test:server": "GR_NO_LISTEN=1 node --test server/scrape.test.js server/og.test.js",
     "test:web": "vitest run",
