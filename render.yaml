@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: giftradar
+    runtime: node
+    branch: master
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: SCRAPE_CRON
+        value: 0 8,18 * * *
