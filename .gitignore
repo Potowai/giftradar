@@ -3,6 +3,7 @@ dist/
 server/data/feed.json
 server/data/manual.json
 server/data/health.json
+server/data/meta.json
 .env
 *.log
 .DS_Store
