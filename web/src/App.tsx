@@ -107,6 +107,13 @@ function countdown(d: number | null): string {
   return d < 0 ? 'fini' : d <= 7 ? `J-${d}` : `${d} j`
 }
 
+function tone(d: number | null): 'hot' | 'warm' | 'cool' | null {
+  if (d == null || d < 0) return null
+  if (d <= 3) return 'hot'
+  if (d <= 7) return 'warm'
+  return 'cool'
+}
+
 export function App() {
   const [contests, setContests] = useState<Contest[]>([])
   const [store, setStore] = useState<Store>(loadStore)
@@ -173,8 +180,8 @@ export function App() {
   }
 
   return (
-    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100dvh', background: '#0b1020', color: '#eef1f8' }}>
-      <NavBar back={null} style={{ background: '#111830' }} right={<Badge content={undone.length}><Button size="mini" color="primary" onClick={() => setAddOpen(true)}>+ AJOUTER</Button></Badge>}>GiftRadar</NavBar>
+    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100dvh', background: 'var(--gr-bg)', color: 'var(--gr-text)' }}>
+      <NavBar back={null} className="gr-nav" right={<Badge content={undone.length}><Button size="mini" color="primary" onClick={() => setAddOpen(true)} aria-label="Ajouter un concours">+ AJOUTER</Button></Badge>}><span className="gr-title">GiftRadar</span></NavBar>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', margin: 8 }}>
         <div style={{ flex: 1 }}><SearchBar placeholder="recherche (iPhone 17, Air…)" value={q} onChange={setQ} /></div>
@@ -200,7 +207,7 @@ export function App() {
         style={{ padding: 8 }}
       />
 
-      <TabBar activeKey={tab} onChange={setTab} style={{ position: 'sticky', bottom: 0, background: '#111830' }}>
+      <TabBar activeKey={tab} onChange={setTab} style={{ position: 'sticky', bottom: 0, background: 'var(--gr-surface-2)', borderTop: '1px solid var(--gr-border)' }}>
         <TabBar.Item key="open" title={`À faire (${undone.length})`} icon={<span>✓</span>} />
         <TabBar.Item key="done" title={`Terminés (${done.length})`} icon={<span>☑</span>} />
       </TabBar>
@@ -209,19 +216,33 @@ export function App() {
 
       <PullToRefresh onRefresh={async () => { setContests(await refreshFeed()) }}>
       <Space direction="vertical" block style={{ padding: '0 0 64px' }}>
-        {visible.map(c => {
+        {visible.map((c, i) => {
           const st = store.entries[c.id]
           const doneSteps = c.steps.filter(s => st?.steps?.[s.label]).length
           const pct = c.steps.length ? (doneSteps / c.steps.length) * 100 : 0
+          const left = daysUntil(c.deadline)
+          const t = tone(left)
           return (
             <Card
               key={c.id}
-              style={{ margin: 8, background: '#151c34', borderRadius: 14, border: '1px solid #232b42' }}
-              title={c.prize.name}
-                extra={<Space wrap><Badge color="#7b2ff7" content={PLATFORM_LABEL[c.platform]} /><Badge color={c.geo.scope === 'world' ? '#3ddc97' : '#ff4d6d'} content={GEO_LABEL[c.geo.scope]} />{c.risk ? <Badge color="#ff8c00" content="vigilance" /> : null}</Space>}
+              className={`gr-card gr-enter${tab === 'done' ? ' gr-done-card' : ''}`}
+              style={{ margin: 8, animationDelay: i < 8 ? `${i * 40}ms` : undefined }}
+              title={<span className="gr-prize">{c.prize.name}</span>}
+              extra={
+                <span className={`gr-j gr-j-${t ?? 'none'}`} aria-label={left == null ? 'sans date limite' : left < 0 ? 'terminé' : `plus que ${left} jours`}>
+                  {countdown(left)}
+                </span>
+              }
             >
-                <b>{c.title}</b>
-                <div style={{ opacity: 0.6, fontSize: 13, marginTop: 4 }}>échéance : {countdown(daysUntil(c.deadline))} · {c.language === 'fr' ? 'FR' : c.language === 'en' ? 'EN' : '?'} · pas de participation (Instagram/Site){c.stale ? ' · ⚠ à vérifier' : ''}</div>
+                <div className="gr-ctitle">{c.title}</div>
+                <div className="gr-meta">échéance : {countdown(left)} · {c.language === 'fr' ? 'FR' : c.language === 'en' ? 'EN' : '?'} · pas de participation (Instagram/Site){c.stale ? ' · ⚠ à vérifier' : ''}</div>
+                <div className="gr-badges">
+                  <Badge color="#7b2ff7" content={PLATFORM_LABEL[c.platform]} />
+                  <span className={`gr-tag ${c.geo.scope === 'world' ? 'gr-tag-world' : c.geo.scope === 'fr' ? 'gr-tag-fr' : 'gr-tag-near'}`}>
+                    {GEO_LABEL[c.geo.scope]}
+                  </span>
+                  {c.risk ? <span className="gr-tag gr-tag-risk">vigilance</span> : null}
+                </div>
                 {c.steps.length > 0 && (
                   <div style={{ marginTop: 10 }}>
                     <Space style={{ width: '100%', marginBottom: 6 }} align="center">
@@ -230,15 +251,15 @@ export function App() {
                     </Space>
                     {c.steps.map(s => (
                       <div key={s.label}>
-                        <Checkbox checked={!!st?.steps?.[s.label]} onChange={() => toggle(c.id, s.label)}>{s.label}</Checkbox>
+                        <Checkbox className="gr-check" checked={!!st?.steps?.[s.label]} onChange={() => toggle(c.id, s.label)}>{s.label}</Checkbox>
                       </div>
                     ))}
                   </div>
                 )}
                 {tab === 'done' ? (
-                  <Button block fill="outline" size="small" style={{ marginTop: 10 }} onClick={() => save(unmark(store, c.id))}>Remettre à faire ↩</Button>
+                  <Button block fill="outline" size="small" className="gr-open-btn" style={{ marginTop: 10 }} onClick={() => save(unmark(store, c.id))}>Remettre à faire ↩</Button>
                 ) : (
-                  <Button block color="primary" size="small" style={{ marginTop: 10 }} onClick={() => openLink(c)}>Ouvrir →</Button>
+                  <Button block color="primary" size="small" className="gr-open-btn" style={{ marginTop: 10 }} onClick={() => openLink(c)}>Ouvrir →</Button>
                 )}
             </Card>
           )

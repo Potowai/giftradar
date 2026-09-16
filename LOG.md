@@ -42,6 +42,13 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
 
+## 7.0 Redesign « radar nocturne » (skills)
+- Spec docs/redesign.md (impeccable + ui-ux-pro-max : palette night-indigo, Outfit single-family, motion unique).
+- J- thermique (hot ≤3j / warm ≤7j), tokens --gr-*, thème antd via --adm-*, stagger d'entrée, reduced-motion respecté.
+- A11y (accesslint) : 4 contrastes corrigés par calcul (primaire #6A5CFF 4.58, badges → pastilles teintées 6.7-12.2), cibles 44px, focus-visible, aria-labels, couleur jamais seule.
+- Agent design délégué mais vide → repris en direct (règle d'orchestration).
+- Règle 5 : 1) oui (tsc+build+26+6 verts) 2) alternative (migration shadcn) rejetée — stack antd verrouillée, skills shadcn dispo pour plus tard 3) zéro bloquant.
+
 ## 6.0 Purge des concours finis (16 sept 2026)
 - Drop : mots-fin ([terminé], *TERMINÉ*, ended/closed/expired, gagnants annoncés), deadlines passées, sans-date >180j (ex: promos Coupe du Monde de juin), news déguisées (staging/slammed/buys N).
 - Dédupe : même tier + même jour + 25 premiers caractères (ex: Tenorshare ×3 → ×1).
