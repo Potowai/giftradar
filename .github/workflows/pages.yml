@@ -3,9 +3,6 @@ name: Deploy PWA to GitHub Pages
 on:
   push:
     branches: [master]
-    paths-ignore:
-      - 'server/data/**'
-      - 'LOG.md'
   workflow_dispatch:
 
 permissions:
