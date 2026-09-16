@@ -3,6 +3,7 @@ export const STORE_KEY = 'gr:v1'
 export interface Entry {
   entered: boolean
   enteredAt?: string
+  openedAt?: string
   steps: Record<string, boolean>
 }
 
@@ -37,8 +38,23 @@ export function saveStore(s: Store): void {
 export function toggleStep(s: Store, id: string, step: string): Store {
   const e: Entry = s.entries[id] ?? { entered: false, steps: {} }
   const steps = { ...e.steps, [step]: !e.steps[step] }
-  const entered = Object.keys(steps).length > 0 && Object.values(steps).every(Boolean)
+  const allDone = Object.keys(steps).length > 0 && Object.values(steps).every(Boolean)
+  const entered = !!e.openedAt || allDone
   return { ...s, entries: { ...s.entries, [id]: { ...e, steps, entered } } }
+}
+
+export function markOpened(s: Store, id: string): Store {
+  const e: Entry = s.entries[id] ?? { entered: false, steps: {} }
+  const now = new Date().toISOString()
+  return { ...s, entries: { ...s.entries, [id]: { ...e, entered: true, enteredAt: now, openedAt: now } } }
+}
+
+export function unmark(s: Store, id: string): Store {
+  const e: Entry = s.entries[id] ?? { entered: false, steps: {} }
+  const { openedAt: _drop, enteredAt: _drop2, ...rest } = e
+  void _drop
+  void _drop2
+  return { ...s, entries: { ...s.entries, [id]: { ...rest, entered: false, steps: {} } } }
 }
 
 export function entryProgress(s: Store, id: string, labels: string[]): { done: number; total: number } {

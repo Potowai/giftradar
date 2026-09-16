@@ -24,3 +24,9 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : entrée IG test créée (og bloqué par Instagram → fallback hostname, attendu), feed 160+1, puis manual.json réinitialisé.
 - Tests og.test.js : 3/3. Total serveur 13/13, web 5/5, build vert.
 - Règle 5 : 1) oui (preuves ci-dessus) 2) alternative (formulaire 100% client) rejetée — le serveur seul contourne les murs anti-hotlink 3) point faible : Instagram bloque l'og-fetch sans session → fallback hostname, l'utilisateur complète le titre à la main si besoin → accepté, zéro bloquant.
+
+## 3.0 Frontend complet (Phase 3)
+- store.ts : openedAt/markOpened/unmark (clic Ouvrir = marqué fait), toggleStep n'écrase plus un "ouvert".
+- App : onglet Terminés avec "Remettre à faire", PullToRefresh, Toasts, dialogue Ajouter → POST /api/entries + refresh, toggle "Faits".
+- store.test.ts : 6/6. Serveur 13/13. Build vert, PWA vérifiée (manifest standalone FR, sw.js + workbox générés).
+- Règle 5 : 1) oui (tsc+build+tests ci-dessus) 2) alternative (swipe-undo) reportée — bouton "Remettre à faire" suffit pour v1 3) doute : pas de test sur vrai iPhone (émulateur indisponible ici) → mitigé par build PWA standard + meta viewport ; à valider demain sur le téléphone → point ouvert assumé, seul restant.

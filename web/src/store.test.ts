@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from 'vitest'
-import { emptyStore, entryProgress, loadStore, saveStore, STORE_KEY, toggleStep } from './store'
+import { emptyStore, entryProgress, loadStore, markOpened, saveStore, STORE_KEY, toggleStep, unmark } from './store'
 
 function stubStorage(initial?: Record<string, string>) {
   const data: Record<string, string> = { ...(initial ?? {}) }
@@ -54,6 +54,18 @@ describe('store', () => {
   it('recovers from corrupted storage', () => {
     stubStorage({ [STORE_KEY]: 'not-json{{{' })
     expect(loadStore()).toEqual({ v: 1, entries: {} })
+  })
+
+  it('markOpened flags entered, unmark resets', () => {
+    let s = emptyStore()
+    s = markOpened(s, 'abc')
+    expect(s.entries.abc.entered).toBe(true)
+    expect(typeof s.entries.abc.openedAt).toBe('string')
+    s = toggleStep(s, 'abc', 'follow')
+    expect(s.entries.abc.entered).toBe(true)
+    s = unmark(s, 'abc')
+    expect(s.entries.abc.entered).toBe(false)
+    expect(s.entries.abc.openedAt).toBeUndefined()
   })
 
   it('computes progress per entry', () => {

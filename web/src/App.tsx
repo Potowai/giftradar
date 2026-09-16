@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Card, Checkbox, Dialog, Empty, Input, NavBar, ProgressBar, SearchBar, Selector, Space, TabBar, Badge } from 'antd-mobile'
+import { Button, Card, Checkbox, Dialog, Empty, Input, NavBar, ProgressBar, PullToRefresh, SearchBar, Selector, Space, TabBar, Toast, Badge } from 'antd-mobile'
 import { Contest, GeoScope, Platform } from './types'
-import { Entry, loadStore, saveStore, Store, toggleStep } from './store'
+import { loadStore, markOpened, saveStore, Store, toggleStep, unmark } from './store'
 
 let sample: Contest[] = []
 let sampleLoaded = false
@@ -15,6 +15,27 @@ async function getFeed(): Promise<Contest[]> {
     if (list.length) { sample = list; sampleLoaded = true }
     return list
   } catch { return sample }
+}
+
+async function refreshFeed(): Promise<Contest[]> {
+  sampleLoaded = false
+  sample = []
+  return getFeed()
+}
+
+async function postEntry(url: string): Promise<{ ok: boolean; title?: string }> {
+  try {
+    const r = await fetch('/api/entries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, platform: 'instagram' }),
+    })
+    if (!r.ok) return { ok: false }
+    const j = await r.json()
+    return { ok: true, title: j.title }
+  } catch {
+    return { ok: false }
+  }
 }
 
 const GEO_LABEL: Record<GeoScope, string> = { nantes: 'Nantes', fr: 'France', eu: 'Europe', world: 'Monde', unknown: '?' }
@@ -48,19 +69,45 @@ export function App() {
     save(toggleStep(store, id, step))
   }
 
-  const undone = useMemo(() =>
-    contests.filter(c => !store.entries[c.id] || Object.values((store.entries[c.id] as Entry).steps ?? {}).some(v => !v)),
-    [contests, store],
-  )
+  const isDone = (c: Contest) => !!store.entries[c.id]?.entered
 
-  const visible = useMemo(() =>
-    undone
+  const openLink = (c: Contest) => {
+    save(markOpened(store, c.id))
+    Toast.show({ content: 'Marqué comme fait ✓', duration: 1500 })
+    window.open(c.url, '_blank')
+  }
+
+  const filtered = useMemo(() =>
+    contests
       .filter(c => !geo || c.geo.scope === geo)
       .filter(c => !q || (c.title + ' ' + c.prize.name).toLowerCase().includes(q.toLowerCase()))
-      .filter(c => !hideDone || !(store.entries[c.id]?.entered))
       .sort((a, b) => (daysUntil(a.deadline) ?? 999) - (daysUntil(b.deadline) ?? 999)),
-    [undone, geo, q, hideDone, store],
+    [contests, geo, q],
   )
+
+  const undone = useMemo(() => filtered.filter(c => !isDone(c)), [filtered, store])
+  const done = useMemo(() => filtered.filter(c => isDone(c)), [filtered, store])
+
+  const visible = useMemo(() => {
+    const list = tab === 'done' ? done : undone
+    return hideDone ? list.filter(c => !isDone(c)) : list
+  }, [tab, done, undone, hideDone, store])
+
+  const doAdd = async () => {
+    const u = url.trim()
+    if (!u) return
+    setAddOpen(false)
+    setUrl('')
+    Toast.show({ content: 'Ajout en cours…', duration: 1200 })
+    const r = await postEntry(u)
+    if (r.ok) {
+      const fresh = await refreshFeed()
+      setContests(fresh)
+      Toast.show({ content: `Ajouté : ${(r.title || 'concours').slice(0, 40)}`, duration: 2000 })
+    } else {
+      Toast.show({ content: 'Échec — réessaie (serveur joignable ?)', duration: 2000 })
+    }
+  }
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100dvh', background: '#0b1020', color: '#eef1f8' }}>
@@ -83,12 +130,13 @@ export function App() {
       />
 
       <TabBar activeKey={tab} onChange={setTab} style={{ position: 'sticky', bottom: 0, background: '#111830' }}>
-        <TabBar.Item key="open" title={`À faire (${visible.length})`} icon={<span>✓</span>} />
-        <TabBar.Item key="done" title="Terminés" icon={<span>☑</span>} />
+        <TabBar.Item key="open" title={`À faire (${undone.length})`} icon={<span>✓</span>} />
+        <TabBar.Item key="done" title={`Terminés (${done.length})`} icon={<span>☑</span>} />
       </TabBar>
 
       {visible.length === 0 && <Empty description="Rien en ce moment — relance le scan." style={{ padding: 48 }} />}
 
+      <PullToRefresh onRefresh={async () => { setContests(await refreshFeed()) }}>
       <Space direction="vertical" block style={{ padding: '0 0 64px' }}>
         {visible.map(c => {
           const st = store.entries[c.id]
@@ -116,11 +164,16 @@ export function App() {
                     ))}
                   </div>
                 )}
-                <Button block color="primary" size="small" style={{ marginTop: 10 }} onClick={() => { window.open(c.url, '_blank') }}>Ouvrir →</Button>
+                {tab === 'done' ? (
+                  <Button block fill="outline" size="small" style={{ marginTop: 10 }} onClick={() => save(unmark(store, c.id))}>Remettre à faire ↩</Button>
+                ) : (
+                  <Button block color="primary" size="small" style={{ marginTop: 10 }} onClick={() => openLink(c)}>Ouvrir →</Button>
+                )}
             </Card>
           )
         })}
       </Space>
+      </PullToRefresh>
 
       <Dialog
         visible={addOpen}
@@ -128,7 +181,7 @@ export function App() {
         content={<Input placeholder="Colle le lien (Instagram, site…)" value={url} onChange={setUrl} />}
         actions={[
           { key: 'cancel', text: 'Annuler' },
-          { key: 'ok', text: 'Ajouter', onClick: () => { setAddOpen(false); setUrl('') } },
+          { key: 'ok', text: 'Ajouter', onClick: () => { void doAdd() } },
         ]}
       />
     </div>
