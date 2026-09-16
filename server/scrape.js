@@ -71,6 +71,12 @@ const STEPS = {
 export function cleanTitle(raw) {
   return String(raw || '')
     .replace(/<!\[CDATA\[|\]\]>/g, '')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;|&#34;/gi, '"')
+    .replace(/&#0?39;|&apos;/gi, "'")
+    .replace(/&euro;|&#8364;/gi, '€')
+    .replace(/&[a-z]+;/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 }
@@ -359,6 +365,14 @@ export function parseTg(html, base) {
 
 const HTML_PARSERS = { ddj: parseDemonJeu, jcb: parseJcb, cdn: parseCdn, tg: ($, base) => parseTg($.html(), base) }
 
+export function rewriteTgEntry(e) {
+  const core = String(e.title || '').replace(/\s*\(ToutGagner\)\s*$/i, '').trim()
+  e.fiche = e.url
+  e.url = `https://www.google.com/search?q=${encodeURIComponent(`"${core}" concours gagner`)}`
+  e.id = makeId(e.title, e.url)
+  return e
+}
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 export async function scrapeAll() {
@@ -367,7 +381,15 @@ export async function scrapeAll() {
   const seen = new Map()
   const health = []
 
-  const seenTitles = new Set()
+  const rankOf = (id) => {
+    if (/^(ddj|jcb|cdn)/.test(id)) return 5
+    if (/^gn-/.test(id)) return 4
+    if (/^rd-/.test(id)) return 3
+    if (/^tg-/.test(id)) return 2
+    return 1
+  }
+
+  const seenTitles = new Map()
   for (const source of sources || []) {
     try {
       let items
@@ -384,14 +406,18 @@ export async function scrapeAll() {
         items = await fetchFeed(source)
       }
       let kept = 0
+      const rank = rankOf(source.id)
       for (const item of items) {
         const title = cleanTitle(item.title)
         if (!keepItem(title)) continue
         const entry = normalize(item, source, now)
-        if (!entry.url || seen.has(entry.url)) continue
+        if (!entry.url) continue
+        if (seen.has(entry.url)) continue
         const dkey = `${entry.prize.tier}|${(entry.published || '').slice(0, 10)}|${titleKey(title).slice(0, 25)}`
-        if (seenTitles.has(dkey)) continue
-        seenTitles.add(dkey)
+        const prev = seenTitles.get(dkey)
+        if (prev && prev.rank >= rank) continue
+        if (prev) seen.delete(prev.url)
+        seenTitles.set(dkey, { rank, url: entry.url })
         seen.set(entry.url, entry)
         kept++
       }
@@ -413,6 +439,7 @@ export async function scrapeAll() {
       return Number.isNaN(d) || d >= todayStart.getTime()
     })
     .map((e) => {
+      if (e.source && /toutgagner/i.test(e.source)) rewriteTgEntry(e)
       const old = prevById.get(e.id)
       return old ? { ...e, discovered_at: old.discovered_at } : e
     })

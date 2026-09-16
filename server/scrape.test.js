@@ -20,13 +20,18 @@ import {
   parseJcb,
   parseCdn,
   parseTg,
+  rewriteTgEntry,
   canonicalUrl,
   makeId,
   normalize,
 } from './scrape.js'
 
 test('cleanTitle strips CDATA and collapses spaces', () => {
-  assert.equal(cleanTitle('<![CDATA[ Gagner   un iPhone 17 ]]>'), 'Gagner un iPhone 17')
+  assert.equal(cleanTitle('<![CDATA[ Gagnez   un iPhone 17 ]]>'), 'Gagnez un iPhone 17')
+})
+
+test('cleanTitle décode les entités HTML', () => {
+  assert.equal(cleanTitle('Gagnez 1 iPhone&nbsp;Duo &amp; co'), 'Gagnez 1 iPhone Duo & co')
 })
 
 test('detectTier ranks 18 over 17 over apple', () => {
@@ -180,6 +185,14 @@ test('parseTg extrait lots, deadline et plateforme', () => {
   assert.equal(out[0].deadline, '2026-09-20T00:00:00.000Z')
   assert.equal(out[0].isoDate, '2026-09-15T00:00:00.000Z')
   assert.match(out[0].title, /iPhone 17/)
+})
+
+test('rewriteTgEntry remplace par recherche directe', () => {
+  const e = rewriteTgEntry({ title: 'Gagnez 1 iPhone 17 (ToutGagner)', url: 'https://toutgagner.com/concours/g1.html', source: 'ToutGagner smartphones' })
+  assert.match(e.url, /^https:\/\/www\.google\.com\/search\?q=/)
+  assert.match(decodeURIComponent(e.url), /1 iPhone 17/)
+  assert.equal(e.fiche, 'https://toutgagner.com/concours/g1.html')
+  assert.equal(e.id.length, 12)
 })
 
 test('canonicalUrl strips tracking params', () => {

@@ -42,6 +42,13 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
 
+## 16.0 Bypass limite 3/jour ToutGagner
+- Fiche tg = login-wall + compteur, zéro lien direct (« Pour voir le site, abonnez-vous »). Détail ddj = pas de lien direct non plus.
+- Solution : priorité de source aux doublons (ddj/jcb/cdn/gn > tg → URL lisible gardée) + entrées tg-only réécrites vers recherche Google exacte du lot (champ fiche conservé).
+- Bonus : décodage entités HTML global (ex: &nbsp;).
+- Résultat : 124 entrées, 8 tg en liens directs. Tests 34/34 + 6/6, build vert.
+- Règle 5 : 1) oui 2) alternative (bouton « retrouver » séparé) rejetée — 1 seul bouton Ouvrir, plus simple 3) limite : reset des coches tg (ids recalculés, 8 entrées) → assumé, noté ici ; zéro bloquant.
+
 ## 15.0 Concours Facebook
 - Ajouté : cdn-facebook + ddj-cat-facebook (standing, 0 Apple inédit aujourd'hui — tout est déjà couvert par recherche par lot).
 - Total FB : 8 (ugreen, leroiduparebrise…). GN facebook-only : quasi vide, ignoré.

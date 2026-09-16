@@ -39,6 +39,7 @@ export interface Contest {
   stale?: boolean
   published?: string | null
   risk?: boolean
+  fiche?: string
 }
 
 export interface StateEntry {
