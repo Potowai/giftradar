@@ -41,3 +41,10 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Front dégrade proprement sans serveur : snapshot embarqué, ajouts manuels 100% locaux.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
+
+## 6.0 Purge des concours finis (16 sept 2026)
+- Drop : mots-fin ([terminé], *TERMINÉ*, ended/closed/expired, gagnants annoncés), deadlines passées, sans-date >180j (ex: promos Coupe du Monde de juin), news déguisées (staging/slammed/buys N).
+- Dédupe : même tier + même jour + 25 premiers caractères (ex: Tenorshare ×3 → ×1).
+- Douteux (60-180j, ex: vieux giveaways MacRumors) : gardés mais masqués par défaut, toggle "Afficher N douteux".
+- Résultat : 160 → 20 (3 actionnables par défaut + 17 douteux). Tests 19/19 + 6/6, build vert.
+- Règle 5 : 1) oui 2) alternative (seuil stale à 30j) rejetée — constats : 85/97 items GN ont >180j, un seuil bas noie tout 3) limite honnête : sans date de fin explicite on ne peut pas prouver qu'un concours est ouvert — le badge "à vérifier" couvre ce cas ; zéro bloquant.
