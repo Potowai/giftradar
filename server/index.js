@@ -9,18 +9,24 @@ app.use(express.json({ limit: '256kb' }))
 
 app.get('/api/health', async (_req, res) => {
   const feed = await readJson('feed.json', [])
-  res.json({ ok: true, scraped_at: null, entries: feed.length })
+  const meta = await readJson('meta.json', {})
+  res.json({ ok: true, scraped_at: meta.scraped_at || null, entries: feed.length })
 })
 
 app.get('/api/feed', async (_req, res) => {
   const feed = await readJson('feed.json', [])
   const health = await readJson('health.json', [])
-  res.json({ feed, health, scraped_at: null })
+  const meta2 = await readJson('meta.json', {})
+  res.json({ feed, sources: health, scraped_at: meta2.scraped_at || null })
 })
 
 app.post('/api/scrape', async (_req, res) => {
-  const result = await scrapeAll()
-  res.json(result)
+  try {
+    const result = await scrapeAll()
+    res.json(result)
+  } catch (e) {
+    res.status(500).json({ error: String((e && e.message) || e).slice(0, 300) })
+  }
 })
 
 const dist = path.join(import.meta.dirname, '..', 'dist')

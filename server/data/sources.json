@@ -1,32 +1,39 @@
 {
   "sources": [
     {
+      "id": "gn-en-17",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=iphone%20giveaway%20win&hl=en-US&gl=US&ceid=US%3Aen",
+      "lang": "en",
+      "name": "Google News EN iPhone giveaway"
+    },
+    {
+      "id": "gn-en-18",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=iphone%2018%20giveaway&hl=en-US&gl=US&ceid=US%3Aen",
+      "lang": "en",
+      "name": "Google News EN iPhone 18"
+    },
+    {
+      "id": "gn-fr-17",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=concours%20gagner%20iphone&hl=fr&gl=FR&ceid=FR%3Afr",
+      "lang": "fr",
+      "name": "Google News FR concours iPhone"
+    },
+    {
+      "id": "gn-fr-18",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=concours%20iphone%2018%20gagner&hl=fr&gl=FR&ceid=FR%3Afr",
+      "lang": "fr",
+      "name": "Google News FR iPhone 18"
+    },
+    {
       "id": "rd-giveaways",
-      "type": "reddit-feed",
-      "sub": "giveaways",
+      "type": "rss",
+      "url": "https://www.reddit.com/r/giveaways/.rss",
       "lang": "en",
       "name": "r/giveaways"
-    },
-    {
-      "id": "rd-freebies",
-      "type": "reddit-feed",
-      "sub": "freebies",
-      "lang": "en",
-      "name": "r/freebies"
-    },
-    {
-      "id": "rd-search-en",
-      "type": "reddit-search",
-      "query": "iphone giveaway winner",
-      "lang": "en",
-      "name": "Reddit search giveaway"
-    },
-    {
-      "id": "rd-search-fr",
-      "type": "reddit-search",
-      "query": "concours gagner iphone",
-      "lang": "fr",
-      "name": "Reddit search concours"
     }
   ]
 }
