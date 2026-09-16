@@ -42,6 +42,12 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
 
+## 13.0 IG 100% mobile (secret GitHub)
+- Utilisateur mobile-only → pas de .env local possible. Solution : cookies collés en secret Actions IG_COOKIES (via Safari iPhone), script scripts/scrape-ig.mjs branché dans le workflow après le snapshot (garde propre sans cookies).
+- Watchlist : hashtags concoursiphone/concoursapple/giveawayfrance (+ profils, vide pour l'instant), 6 posts/source, 1.5s d'intervalle, fusion dédupliquée dans le snapshot.
+- README : guide extraction cookies via Inspect Browser + ajout du secret, tout mobile.
+- Règle 5 : 1) oui (build+32/32+6/6, garde testée live exit 0) 2) alternative (cookies codés en dur) rejetée — secret uniquement 3) validation live complète en attente des cookies utilisateur ; zéro bloquant côté code.
+
 ## 12.0 X via readers + IG à cookies
 - Readers X : twstalker 403, xcancel 451, nitter mort, syndication morte, xstalk mort. MAIS Google News indexe les posts X → sources gn-x-give (21) + gn-x-concours (5), plateforme détectée via titre (« - x.com », Follow+RT).
 - Instagram : plomberie cookies prête (server/instagram.js, POST /api/ig, og.js enrichi, 4 tests). En attente de la chaîne IG_COOKIES de l'utilisateur pour validation live.
