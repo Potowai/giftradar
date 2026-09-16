@@ -218,7 +218,7 @@ export function App() {
               key={c.id}
               style={{ margin: 8, background: '#151c34', borderRadius: 14, border: '1px solid #232b42' }}
               title={c.prize.name}
-              extra={<Space wrap><Badge color="#7b2ff7" content={PLATFORM_LABEL[c.platform]} /><Badge color={c.geo.scope === 'world' ? '#3ddc97' : '#ff4d6d'} content={GEO_LABEL[c.geo.scope]} /></Space>}
+                extra={<Space wrap><Badge color="#7b2ff7" content={PLATFORM_LABEL[c.platform]} /><Badge color={c.geo.scope === 'world' ? '#3ddc97' : '#ff4d6d'} content={GEO_LABEL[c.geo.scope]} />{c.risk ? <Badge color="#ff8c00" content="vigilance" /> : null}</Space>}
             >
                 <b>{c.title}</b>
                 <div style={{ opacity: 0.6, fontSize: 13, marginTop: 4 }}>échéance : {countdown(daysUntil(c.deadline))} · {c.language === 'fr' ? 'FR' : c.language === 'en' ? 'EN' : '?'} · pas de participation (Instagram/Site){c.stale ? ' · ⚠ à vérifier' : ''}</div>

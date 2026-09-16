@@ -48,3 +48,10 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Douteux (60-180j, ex: vieux giveaways MacRumors) : gardés mais masqués par défaut, toggle "Afficher N douteux".
 - Résultat : 160 → 20 (3 actionnables par défaut + 17 douteux). Tests 19/19 + 6/6, build vert.
 - Règle 5 : 1) oui 2) alternative (seuil stale à 30j) rejetée — constats : 85/97 items GN ont >180j, un seuil bas noie tout 3) limite honnête : sans date de fin explicite on ne peut pas prouver qu'un concours est ouvert — le badge "à vérifier" couvre ce cas ; zéro bloquant.
+
+## 7.0 Annuaires spécialisés (listes par lot)
+- 3 annuaires FR intégrés comme sources HTML : Démon du Jeu (recherche par lot, slug = prix+plateforme+deadline), Jeu-Concours.biz (page gagner-iphone.html, 15 fiches récentes, fin absolue/relative par fiche), Concours du Net (cartes high-tech, "Fin le JJ/MM/AAAA"). ToutGagner écarté (rendement nul).
+- Slug parsing FR (mois en toutes lettres), deadlines JJ/MM/AAAA, plateformes IG/FB depuis URL, badge "vigilance" (frais de port, surtaxé, Telegram/WhatsApp, coordonnées bancaires).
+- Résultat : 20 → 61 entrées (26 IG + 6 FB), ex : iPhone 18 Pro Max IG fin 20 sept, iPhone 18 FB fin 30 oct. Tests 26/26 + 6/6, build vert.
+- X/IG en recherche directe : pas d'API publique → reste manuel (hashtags #concoursiphone #giveawayfrance + comptes marques dans README).
+- Règle 5 : 1) oui 2) alternative (scraper les pages détail une par une) rejetée — 60+ requêtes, anti-bot probable, le slug donne déjà l'essentiel 3) doute : conditions exactes (like/tag/RT) non extraites — affichées génériquement par plateforme, l'utilisateur les voit en ouvrant le lien ; zéro bloquant.

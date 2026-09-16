@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import Parser from 'rss-parser'
+import { load } from 'cheerio'
 import { readJson, writeJson } from './util.js'
 
 const UA = process.env.USER_AGENT || 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122 Safari/537.36'
@@ -8,7 +9,7 @@ const STAGGER_MS = 2500
 
 const parser = new Parser({ timeout: TIMEOUT_MS, headers: { 'User-Agent': UA } })
 
-const INTENT = /gagn|win|giveaway|concours|jeu\b|tentez|remporter|enter to win|chance|lot|tirage|quiz/i
+const INTENT = /gagn|win|giveaway|concours|jeu\b|tentez|remport|enter to win|chance|lot|tirage|quiz/i
 const PRIZE = /iphone|apple|ipad|airpods|macbook|watch|ios/i
 const NOISE = /retrouv|volé|volée|procès|arrêté|interpellé|escroquerie|arnaque|fake|mort|décès|slammed|slam\b|staging|staged|buys?\s+\d+|bought\s+\d+|lawsuit|sues?\b|arrest/i
 
@@ -34,6 +35,29 @@ const GEO_FR = /france|français|francais|métropole|metropole|\.fr\b|paris|lyon
 const GEO_EU = /europe|european|e\.u\.|\beu\b|belgique|suisse|espagne|italie|allemagne/i
 
 const DEADLINE = /(?:ends?|closes?|deadline|fin|clôture|cloture|jusqu'au|avant le)\s*[:–-]?\s*([0-3]?\d(?:er)?\s+(?:janvier|février|fevrier|mars|avril|mai|juin|juillet|août|aout|septembre|octobre|novembre|décembre|decembre|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{4}|(?:january|february|march|april|may|june|july|august|september|october|november|december)\s+[0-3]?\d(?:st|nd|rd|th)?,?\s+\d{4})/i
+
+const MONTHS = {
+  janvier: 1, fevrier: 2, 'février': 2, mars: 3, avril: 4, mai: 5, juin: 6,
+  juillet: 7, aout: 8, 'août': 8, septembre: 9, octobre: 10, novembre: 11,
+  decembre: 12, 'décembre': 12, janv: 1, fevr: 2, 'févr': 2, avr: 4, juil: 7,
+  sept: 9, oct: 10, nov: 11, dec: 12, 'déc': 12,
+}
+
+const RISK = /frais de port|participation payante|numéro surtaxé|numero surtaxé|0 899|08 9\d|telegram|whatsapp|coordonnées bancaires|coordonnees bancaires|\biban\b|reconditionné\b.*iphone\s*x\b|iphone\s*x\b.*reconditionné/i
+
+export function detectRisk(title) {
+  return RISK.test(String(title || ''))
+}
+
+export function parseFrDate(day, monthWord, year) {
+  const m = MONTHS[String(monthWord || '').toLowerCase()]
+  const d = Number(day)
+  const y = Number(year)
+  if (!m || !d || !y) return null
+  const dt = new Date(Date.UTC(y, m - 1, d))
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) return null
+  return dt.toISOString()
+}
 
 const STEPS = {
   instagram: [{ label: 'Suivre le compte' }, { label: 'Liker le post' }, { label: 'Commenter + taguer' }],
@@ -85,10 +109,33 @@ export function detectGeo(title, url, fallbackLang) {
 }
 
 export function detectDeadline(title) {
-  const m = String(title || '').match(DEADLINE)
+  const t = String(title || '')
+  const slash = t.match(/(\b\d{2})\/(\d{2})\/(20\d{2}\b)/)
+  if (slash) {
+    const dt = new Date(Date.UTC(Number(slash[3]), Number(slash[2]) - 1, Number(slash[1])))
+    if (!Number.isNaN(dt.getTime())) return dt.toISOString()
+  }
+  const m = t.match(DEADLINE)
   if (!m) return null
   const d = new Date(m[1])
   return Number.isNaN(d.getTime()) ? null : d.toISOString()
+}
+
+export function slugDate(slug) {
+  const m = String(slug || '')
+    .toLowerCase()
+    .match(/jusqu-au-(\d{1,2})-([a-zéû]+)-(\d{4})/)
+  if (!m) return null
+  return parseFrDate(m[1], m[2], m[3])
+}
+
+export function slugPlatform(slug) {
+  const s = String(slug || '').toLowerCase()
+  if (s.includes('sur-instagram') || s.includes('-instagram-') || s.includes('concours-instagram-')) return 'instagram'
+  if (s.includes('sur-facebook') || s.includes('-facebook-') || s.includes('concours-facebook-')) return 'facebook'
+  if (s.includes('tiktok')) return 'tiktok'
+  if (s.includes('youtube')) return 'youtube'
+  return 'site'
 }
 
 export function detectPlatform(url) {
@@ -150,8 +197,8 @@ export function normalize(item, source, now) {
   const url = canonicalUrl(item.link || item.url || '')
   const prize = detectTier(title)
   const language = detectLanguage(title, source.lang)
-  const platform = detectPlatform(url)
-  const deadline = detectDeadline(title)
+  const platform = item.platform || detectPlatform(url)
+  const deadline = item.deadline || detectDeadline(title)
   return {
     id: makeId(title, url),
     title,
@@ -163,6 +210,7 @@ export function normalize(item, source, now) {
     deadline,
     published: item.isoDate ? new Date(item.isoDate).toISOString() : null,
     stale: !deadline && isStale(item.isoDate, Date.parse(now)),
+    risk: detectRisk(title),
     source: source.name || source.id,
     kind: 'auto',
     steps: STEPS[platform] || STEPS.site,
@@ -177,6 +225,108 @@ async function fetchFeed(source) {
   return feed.items || []
 }
 
+async function fetchHtml(url) {
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
+  try {
+    const r = await fetch(url, { signal: ctrl.signal, headers: { 'User-Agent': UA, Accept: 'text/html' } })
+    if (!r.ok) throw new Error(`http ${r.status}`)
+    return load(await r.text())
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+function prettySlug(slug) {
+  return String(slug || '')
+    .replace(/\.php$|\.html$/, '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/iphone/gi, 'iPhone')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+export function parseDemonJeu($, base) {
+  const out = []
+  $('article[id^="article-concours-id-"]').each((_, el) => {
+    const $el = $(el)
+    const org = $el.find('[data-concours-nom]').attr('data-concours-nom') || ''
+    $el.find('a[href$=".php"]').each((__, a) => {
+      const href = $(a).attr('href') || ''
+      if (!/iphone/i.test(href)) return
+      const slug = href.split('/').pop()
+      const prizePart = (slug.match(/gagnez-(.+?)(?:-sur-|-jusqu-au-|\.php)/i) || [])[1] || 'iPhone'
+      out.push({
+        title: `Gagnez ${prettySlug(prizePart)} (${org})`.slice(0, 140),
+        link: new URL(href, base).toString(),
+        isoDate: null,
+        platform: slugPlatform(slug),
+        deadline: slugDate(slug),
+      })
+    })
+  })
+  return out
+}
+
+export function parseJcb($, base, now) {
+  const out = []
+  $('article[id^="fiche-concours-"]').each((_, el) => {
+    const $el = $(el)
+    const href = $el.find('a.concours-id[href*="iphone"]').attr('href')
+    if (!href) return
+    const org = $el.find('h3.concours-title a').first().text().trim() || 'Influenceur'
+    const text = $el.text().replace(/\s+/g, ' ')
+    let deadline = null
+    const abs = text.match(/(?:se termine(?:ront)?(?: le)?|fin(?: le)?)\s*(?:\w+\s+)?(\d{2}\/\d{2}\/20\d{2})/i)
+    if (abs) {
+      const [, d, m, y] = abs[0].match(/(\d{2})\/(\d{2})\/(20\d{2})/)
+      deadline = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d))).toISOString()
+    } else {
+      const rel = text.match(/dans (\d+) jours?/i)
+      if (rel) deadline = new Date(Date.parse(now) + Number(rel[1]) * 86400000).toISOString()
+    }
+    const added = text.match(/ajouté le (\d{2}\/\d{2}\/20\d{2})/i)
+    let published = null
+    if (added) {
+      const [, d, m, y] = added[0].match(/(\d{2})\/(\d{2})\/(20\d{2})/)
+      published = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d))).toISOString()
+    }
+    const slug = href.split('/').pop()
+    out.push({
+      title: `Concours ${org} : ${prettySlug(slug.replace(/^concours-(instagram|facebook|tiktok|youtube)-/, ''))}`.slice(0, 140),
+      link: new URL(href, base).toString(),
+      isoDate: published,
+      platform: slugPlatform(href),
+      deadline,
+    })
+  })
+  return out
+}
+
+export function parseCdn($, base, now) {
+  const out = []
+  $('article.concours-card').each((_, el) => {
+    const $el = $(el)
+    const a = $el.find('a[href^="/jeu-concours-"]').first()
+    const href = a.attr('href') || ''
+    const label = a.attr('aria-label') || ''
+    if (!/iphone/i.test(label + ' ' + href)) return
+    const text = $el.text().replace(/\s+/g, ' ')
+    const title = (label.replace(/^Voir la fiche du concours\s*/i, '') || 'Concours').slice(0, 140)
+    let deadline = null
+    const fin = text.match(/Fin le (\d{2})\/(\d{2})\/(20\d{2})/i)
+    if (fin) deadline = new Date(Date.UTC(Number(fin[3]), Number(fin[2]) - 1, Number(fin[1]))).toISOString()
+    let published = null
+    const pub = text.match(/Publié il y a (\d+) jours?/i)
+    if (pub) published = new Date(Date.parse(now) - Number(pub[1]) * 86400000).toISOString()
+    const platform = /instagram/i.test(text) ? 'instagram' : /facebook/i.test(text) ? 'facebook' : 'site'
+    out.push({ title, link: new URL(href, base).toString(), isoDate: published, platform, deadline })
+  })
+  return out
+}
+
+const HTML_PARSERS = { ddj: parseDemonJeu, jcb: parseJcb, cdn: parseCdn }
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 export async function scrapeAll() {
@@ -188,7 +338,19 @@ export async function scrapeAll() {
   const seenTitles = new Set()
   for (const source of sources || []) {
     try {
-      const items = await fetchFeed(source)
+      let items
+      if (source.type === 'html' && HTML_PARSERS[source.parser]) {
+        const $ = await fetchHtml(source.url)
+        items = HTML_PARSERS[source.parser]($, source.url, now).map((r) => ({
+          title: r.title,
+          link: r.url || r.link,
+          isoDate: r.isoDate,
+          platform: r.platform,
+          deadline: r.deadline,
+        }))
+      } else {
+        items = await fetchFeed(source)
+      }
       let kept = 0
       for (const item of items) {
         const title = cleanTitle(item.title)

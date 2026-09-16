@@ -34,6 +34,30 @@
       "url": "https://www.reddit.com/r/giveaways/.rss",
       "lang": "en",
       "name": "r/giveaways"
+    },
+    {
+      "id": "ddj-iphone",
+      "type": "html",
+      "parser": "ddj",
+      "url": "https://www.ledemondujeu.com/concours-recherche.php?motcle=iphone",
+      "lang": "fr",
+      "name": "Démon du Jeu iPhone"
+    },
+    {
+      "id": "jcb-iphone",
+      "type": "html",
+      "parser": "jcb",
+      "url": "https://www.jeu-concours.biz/gagner-iphone.html",
+      "lang": "fr",
+      "name": "Jeu-Concours.biz iPhone"
+    },
+    {
+      "id": "cdn-hightech",
+      "type": "html",
+      "parser": "cdn",
+      "url": "https://www.concours-du-net.com/concours-high-tech-multimedia",
+      "lang": "fr",
+      "name": "Concours du Net High-Tech"
     }
   ]
 }

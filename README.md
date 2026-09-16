@@ -45,7 +45,14 @@ Le scan tourne seul : cron `0 8,18 * * *` (modifiable via `SCRAPE_CRON`) + re-sc
 
 ## Données
 
-- Config sources : `server/data/sources.json` (versionné).
+- Config sources : `server/data/sources.json` (versionné) — Google News RSS (EN/FR, 17/18), r/giveaways, Démon du Jeu, Jeu-Concours.biz, Concours du Net.
 - Générés au runtime (gitignorés) : `feed.json`, `manual.json`, `health.json`, `meta.json`.
+
+## Veille manuelle (X / Instagram, non scrapables sans compte)
+
+- X : `("iPhone 17 Pro" OR "iPhone 18") (concours OR giveaway) (RT OR tirage) -is:retweet`, onglet Récents.
+- Instagram : hashtags #concoursiphone #concoursapple #giveawayfrance + comptes marques (Fnac, Darty, LDLC, opérateurs).
+- Tout lien trouvé → bouton + dans l'app.
+- Alertes : jamais de frais de port / numéro surtaxé / lien Telegram-WhatsApp / coordonnées bancaires (badge « vigilance » si détecté).
 
 Journal de construction : `LOG.md`.

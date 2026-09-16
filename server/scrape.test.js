@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { load } from 'cheerio'
 import {
   cleanTitle,
   detectTier,
@@ -11,6 +12,13 @@ import {
   isStale,
   isAncient,
   titleKey,
+  slugDate,
+  slugPlatform,
+  detectRisk,
+  detectDeadline,
+  parseDemonJeu,
+  parseJcb,
+  parseCdn,
   canonicalUrl,
   makeId,
   normalize,
@@ -95,6 +103,62 @@ test('titleKey normalizes for dedupe', () => {
   const a = titleKey('Win an iPhone 18! Get 25% Off - PR Newswire')
   const b = titleKey('win an iphone 18  get 25% off - star beacon')
   assert.equal(a, b)
+})
+
+test('slugDate lit les deadlines FR des slugs', () => {
+  assert.equal(slugDate('concours-x-gagnez-1-iphone-18-pro-max-sur-instagram-jusqu-au-20-septembre-2026.php'), '2026-09-20T00:00:00.000Z')
+  assert.equal(slugDate('jeux-y-gagnez-1-iphone-18-pro-sur-facebook-jusqu-au-07-octobre-2026.php'), '2026-10-07T00:00:00.000Z')
+  assert.equal(slugDate('concours-z-gagnez-1-iphone-17.php'), null)
+  assert.equal(slugDate('x-jusqu-au-31-septembre-2026.php'), null)
+})
+
+test('slugPlatform lit la plateforme', () => {
+  assert.equal(slugPlatform('concours-x-sur-instagram-jusqu-au-20-septembre-2026.php'), 'instagram')
+  assert.equal(slugPlatform('2026/09/08/concours-facebook-le-roi-du-pare-brise-gagner-iphone-18.html'), 'facebook')
+  assert.equal(slugPlatform('jeu-nextmobiles.com-gagnez-1-iphone-17e.html'), 'site')
+})
+
+test('detectDeadline lit JJ/MM/AAAA', () => {
+  assert.equal(detectDeadline('Fin le 30/09/2026'), '2026-09-30T00:00:00.000Z')
+})
+
+test('detectRisk signale les arnaques probables', () => {
+  assert.equal(detectRisk('Gagnez un iPhone, seuls les frais de port à payer'), true)
+  assert.equal(detectRisk('Validez sur Telegram pour recevoir le lot'), true)
+  assert.equal(detectRisk('MacRumors Giveaway: Win an iPhone 17'), false)
+})
+
+test('parseDemonJeu extrait fiches iPhone', () => {
+  const $ = load(`<article id="article-concours-id-1" class="bloc-article">
+    <h3><a data-concours-nom="factoryandco.com">factoryandco.com</a></h3>
+    <a href="concours-factoryandco.com-gagnez-1-iphone-18-pro-max-sur-instagram-jusqu-au-20-septembre-2026.php">376888</a>
+  </article>`)
+  const out = parseDemonJeu($, 'https://www.ledemondujeu.com/')
+  assert.equal(out.length, 1)
+  assert.equal(out[0].platform, 'instagram')
+  assert.equal(out[0].deadline, '2026-09-20T00:00:00.000Z')
+  assert.match(out[0].link, /ledemondujeu\.com/)
+})
+
+test('parseJcb extrait fiches + fin relative', () => {
+  const $ = load(`<article class="bloc-concours" id="fiche-concours-1">
+    <h3 class="concours-title"><a>Ugreen</a></h3>
+    <footer><a href="2026/09/16/concours-facebook-ugreen-gagner-iphone-18-pro.html" class="concours-id">jeu</a> ajouté le 16/09/2026</footer>
+    <div>se termineront dans 21 jours</div>
+  </article>`)
+  const out = parseJcb($, 'https://www.jeu-concours.biz/', '2026-09-16T12:00:00.000Z')
+  assert.equal(out.length, 1)
+  assert.equal(out[0].platform, 'facebook')
+  assert.equal(out[0].deadline, '2026-10-07T12:00:00.000Z')
+})
+
+test('parseCdn extrait cartes high-tech', () => {
+  const $ = load(`<article class="concours-card"><a href="/jeu-concours-nextmobiles-x" aria-label="Voir la fiche du concours Remportez : Un iPhone 18 Pro.">x</a><div>Instagram</div><span>Fin le 30/09/2026</span><span>Publié il y a 1 jour</span></article>`)
+  const out = parseCdn($, 'https://www.concours-du-net.com', '2026-09-16T12:00:00.000Z')
+  assert.equal(out.length, 1)
+  assert.equal(out[0].platform, 'instagram')
+  assert.equal(out[0].deadline, '2026-09-30T00:00:00.000Z')
+  assert.match(out[0].title, /iPhone 18 Pro/)
 })
 
 test('canonicalUrl strips tracking params', () => {

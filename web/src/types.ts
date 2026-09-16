@@ -38,6 +38,7 @@ export interface Contest {
   image?: string
   stale?: boolean
   published?: string | null
+  risk?: boolean
 }
 
 export interface StateEntry {
