@@ -42,6 +42,12 @@ Format : `[phase] note` — chaque commit pousse une ligne datée.
 - Vérifié live : page 200, snapshot 159 entrées, manifest 200, run scrape manuel vert + commit bot + redéploiement auto.
 - Règle 5 : 1) oui (build+tests verts avant push, déploiement live vérifié par curl) 2) alternative (Vercel/Netlify serverless) rejetée — refactor inutile pour une app perso 3) doute : snapshot figé entre 2 scans (≤12h de décalage) → assumé, le cron couvre ; zéro bloquant.
 
+## 11.0 Fetch direct IG/X : testé, impossible en gratuit
+- Instagram sans session : mur de login (titre générique, 0 donnée post). X sans login : redirect auth-wall (302). API X payante (~200$/mois), Graph API IG réservée aux comptes possédés.
+- Seule voie technique (cookies de session perso) = fragile + violation ToS + risque de ban du compte servant à participer → refusé.
+- Telegram t.me/s/... fonctionne sans auth mais aucun canal concours public trouvé (bonsplans = deals Amazon, 0 IG).
+- Couverture retenue : annuaires à relais humain (jcb/ddj/cdn) + ajout manuel + watchlist README.
+
 ## 10.0 Concours influenceurs/marques EU-tech
 - jcb gagner-iphone = déjà 48 fiches influenceurs/marques (fabiancrfx, yanissa, ugreen, celio…) — cœur de la couverture.
 - Ajouté : cdn-instagram + cdn-x (standing, 0 Apple aujourd'hui, se déclencheront seuls).
